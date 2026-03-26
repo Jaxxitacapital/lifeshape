@@ -843,6 +843,7 @@
                                         <option value="monthly">Monthly Partner (Card)</option>
                                     </select>
                                     <textarea id="order-notes" rows="2" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Notes (optional)"></textarea>
+                                    <p id="money-order-line-items" class="text-xs text-gray-400">Order items: none selected yet.</p>
 
                                     <div class="p-3 rounded-lg bg-white/5 border border-white/10">
                                         <label class="flex items-center gap-2 text-sm text-white mb-2 cursor-pointer">
@@ -856,7 +857,7 @@
                                     </div>
 
                                     <p id="money-order-status" class="hidden text-xs rounded-lg px-3 py-2 border"></p>
-                                    <button type="submit" class="w-full btn-gold text-deep-navy font-bold py-3 rounded-xl">Place Money Order</button>
+                                    <button id="money-order-submit" type="submit" class="w-full btn-gold text-deep-navy font-bold py-3 rounded-xl">Place Money Order</button>
                                 </form>
                                 <div id="money-order-links" class="hidden mt-3 space-y-2 text-sm">
                                     <a id="money-order-email-link" href="#" class="text-gold hover:underline block">Send order by email</a>
@@ -1168,6 +1169,8 @@
             const orderEmailLink = document.getElementById('money-order-email-link');
             const orderWhatsAppLink = document.getElementById('money-order-whatsapp-link');
             const orderLinksWrap = document.getElementById('money-order-links');
+            const orderLineItems = document.getElementById('money-order-line-items');
+            const orderSubmitBtn = document.getElementById('money-order-submit');
             const orderNotRobot = document.getElementById('order-not-robot');
             const orderCaptchaQuestion = document.getElementById('order-captcha-question');
             const orderCaptchaAnswer = document.getElementById('order-captcha-answer');
@@ -1212,11 +1215,24 @@
 
                 if (selected.length === 0) {
                     cartContainer.innerHTML = '<p class="text-gray-500">Your cart is empty. Add causes to proceed.</p>';
+                    if (orderLineItems) orderLineItems.textContent = 'Order items: none selected yet.';
+                    if (orderSubmitBtn) {
+                        orderSubmitBtn.disabled = true;
+                        orderSubmitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                    }
                 } else {
                     cartContainer.innerHTML = selected.map(([id, qty]) => {
                         const lineTotal = catalog[id].amount * qty;
                         return `<div class="flex items-center justify-between"><span>${catalog[id].title} × ${qty}</span><span class="text-gold">${formatKES(lineTotal)}</span></div>`;
                     }).join('');
+                    if (orderLineItems) {
+                        const itemSummary = selected.map(([id, qty]) => `${catalog[id].title} x${qty}`).join(', ');
+                        orderLineItems.textContent = `Order items: ${itemSummary}.`;
+                    }
+                    if (orderSubmitBtn) {
+                        orderSubmitBtn.disabled = false;
+                        orderSubmitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                    }
                 }
 
                 totalLabel.textContent = formatKES(total);
