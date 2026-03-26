@@ -239,7 +239,12 @@
         const SITE_CONFIG = {
             contactEmail: 'hello@lifeshapekabu.org',
             registrationEndpoint: 'https://formsubmit.co/ajax/hello@lifeshapekabu.org',
-            whatsappNumber: '254701279476'
+            whatsappNumber: '254701279476',
+            payments: {
+                currency: 'KES',
+                oneTimeLink: 'https://paystack.shop/pay/lifeshape-give-once',
+                monthlyLink: 'https://paystack.shop/pay/lifeshape-give-monthly'
+            }
         };
 
         // Page Content Data
@@ -790,7 +795,7 @@
                             </div>
                         </div>
 
-                        <div class="md:col-span-3">
+                        <div class="md:col-span-3 space-y-8">
                             <form id="registration-form" class="bg-[#050A18] border border-gold/20 p-8 md:p-10 rounded-3xl shadow-2xl">
                                 <h3 class="text-2xl font-bold mb-8 text-white">Registration Form</h3>
                                 
@@ -844,6 +849,34 @@
                                     <i data-lucide="send" class="w-5 h-5"></i>
                                 </button>
                             </form>
+
+                            <section class="bg-[#050A18] border border-gold/20 p-8 md:p-10 rounded-3xl shadow-2xl">
+                                <h3 class="text-2xl font-bold text-white mb-3">Support the Movement</h3>
+                                <p class="text-gray-400 mb-6">Inspired by simple giving models: choose a one-time gift or become a monthly partner.</p>
+
+                                <div class="grid sm:grid-cols-2 gap-3 mb-5">
+                                    <button class="giving-frequency-btn btn-gold text-deep-navy font-bold py-3 rounded-xl" data-frequency="once" type="button">One-Time Giving</button>
+                                    <button class="giving-frequency-btn border border-gold/30 text-gold font-bold py-3 rounded-xl hover:bg-gold/10 transition" data-frequency="monthly" type="button">Monthly Partner</button>
+                                </div>
+
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                                    <button class="giving-amount-btn border border-white/10 text-white py-2 rounded-lg hover:border-gold hover:text-gold transition" data-amount="500" type="button">KES 500</button>
+                                    <button class="giving-amount-btn border border-white/10 text-white py-2 rounded-lg hover:border-gold hover:text-gold transition" data-amount="1000" type="button">KES 1,000</button>
+                                    <button class="giving-amount-btn border border-white/10 text-white py-2 rounded-lg hover:border-gold hover:text-gold transition" data-amount="2500" type="button">KES 2,500</button>
+                                    <button class="giving-amount-btn border border-white/10 text-white py-2 rounded-lg hover:border-gold hover:text-gold transition" data-amount="5000" type="button">KES 5,000</button>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label for="custom-giving-amount" class="block text-sm font-bold text-gray-400 mb-2">Other Amount (KES)</label>
+                                    <input id="custom-giving-amount" type="number" min="100" step="50" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition" placeholder="Enter custom amount">
+                                </div>
+
+                                <a id="give-now-link" href="https://paystack.shop/pay/lifeshape-give-once" target="_blank" rel="noopener" class="w-full btn-gold text-deep-navy font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-2">
+                                    <span>Proceed to Secure Checkout</span>
+                                    <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                                </a>
+                                <p class="text-xs text-gray-500 mt-4">Need help with giving? <a href="https://wa.me/254701279476" target="_blank" rel="noopener" class="text-gold hover:underline">Chat on WhatsApp</a>.</p>
+                            </section>
                         </div>
                     </div>
                 </div>
@@ -880,6 +913,7 @@
 
                 // Re-bind contact form when contact page is rendered
                 initRegistrationForm();
+                initGivingWidget();
             }, 200); // match roughly with a short fade duration
         }
 
@@ -977,6 +1011,61 @@
             });
         }
 
+        function initGivingWidget() {
+            const checkoutLink = document.getElementById('give-now-link');
+            if (!checkoutLink) return;
+
+            const frequencyButtons = document.querySelectorAll('.giving-frequency-btn');
+            const amountButtons = document.querySelectorAll('.giving-amount-btn');
+            const customAmountInput = document.getElementById('custom-giving-amount');
+
+            let selectedFrequency = 'once';
+            let selectedAmount = '';
+
+            const getBaseLink = () => selectedFrequency === 'monthly' ? SITE_CONFIG.payments.monthlyLink : SITE_CONFIG.payments.oneTimeLink;
+
+            const updateCheckoutLink = () => {
+                const base = getBaseLink();
+                const customAmount = customAmountInput?.value?.trim();
+                const amount = customAmount || selectedAmount;
+                checkoutLink.href = amount ? `${base}?amount=${encodeURIComponent(amount)}&currency=${SITE_CONFIG.payments.currency}` : base;
+            };
+
+            frequencyButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedFrequency = btn.dataset.frequency || 'once';
+                    frequencyButtons.forEach(item => {
+                        item.classList.remove('btn-gold', 'text-deep-navy');
+                        item.classList.add('border', 'border-gold/30', 'text-gold');
+                    });
+                    btn.classList.remove('border', 'border-gold/30', 'text-gold');
+                    btn.classList.add('btn-gold', 'text-deep-navy');
+                    updateCheckoutLink();
+                });
+            });
+
+            amountButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedAmount = btn.dataset.amount || '';
+                    if (customAmountInput) customAmountInput.value = '';
+                    amountButtons.forEach(item => item.classList.remove('border-gold', 'text-gold', 'bg-gold/10'));
+                    btn.classList.add('border-gold', 'text-gold', 'bg-gold/10');
+                    updateCheckoutLink();
+                });
+            });
+
+            if (customAmountInput) {
+                customAmountInput.addEventListener('input', () => {
+                    if (customAmountInput.value) {
+                        amountButtons.forEach(item => item.classList.remove('border-gold', 'text-gold', 'bg-gold/10'));
+                    }
+                    updateCheckoutLink();
+                });
+            }
+
+            updateCheckoutLink();
+        }
+
         // Initialize App on Load
         document.addEventListener('DOMContentLoaded', () => {
             // Setup smooth transitions for the main container
@@ -990,6 +1079,7 @@
 
             // Initialize form handler for default page load if needed
             initRegistrationForm();
+            initGivingWidget();
         });
     </script>
 </body>
