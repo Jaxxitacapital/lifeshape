@@ -153,6 +153,7 @@
                 <button onclick="navigateTo('about')" class="nav-link" id="nav-about">About</button>
                 <button onclick="navigateTo('events')" class="nav-link" id="nav-events">Events</button>
                 <button onclick="navigateTo('resources')" class="nav-link" id="nav-resources">Resources</button>
+                <button onclick="navigateTo('contribution')" class="nav-link" id="nav-contribution">Contribution</button>
                 <button onclick="navigateTo('contact')" class="btn-gold px-6 py-2.5 rounded-full text-deep-navy font-bold ml-4" id="nav-contact">Join Now</button>
             </div>
 
@@ -172,6 +173,7 @@
         <button onclick="navigateTo('about'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">About Us</button>
         <button onclick="navigateTo('events'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">Events</button>
         <button onclick="navigateTo('resources'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">Resources</button>
+        <button onclick="navigateTo('contribution'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">Contribution</button>
         <button onclick="navigateTo('contact'); toggleMenu();" class="btn-gold px-8 py-3 rounded-full text-deep-navy font-bold mt-4">Join Movement</button>
     </div>
 
@@ -206,6 +208,7 @@
                     <li><button onclick="navigateTo('about')" class="hover:text-gold transition">About Us</button></li>
                     <li><button onclick="navigateTo('events')" class="hover:text-gold transition">Upcoming Events</button></li>
                     <li><button onclick="navigateTo('resources')" class="hover:text-gold transition">Growth Resources</button></li>
+                    <li><button onclick="navigateTo('contribution')" class="hover:text-gold transition">Contribution & Checkout</button></li>
                     <li><button onclick="navigateTo('contact')" class="hover:text-gold transition">Contact Leadership</button></li>
                 </ul>
             </div>
@@ -242,8 +245,14 @@
             whatsappNumber: '254701279476',
             payments: {
                 currency: 'KES',
-                oneTimeLink: 'https://paystack.shop/pay/lifeshape-give-once',
-                monthlyLink: 'https://paystack.shop/pay/lifeshape-give-monthly'
+                paypalReceiver: 'jaxmanro@gmail.com',
+                paypalCheckoutBase: 'https://www.paypal.com/cgi-bin/webscr',
+                cardCheckoutLink: 'https://paystack.shop/pay/lifeshape-give-once',
+                monthlyCardCheckoutLink: 'https://paystack.shop/pay/lifeshape-give-monthly'
+            },
+            captcha: {
+                minNumber: 2,
+                maxNumber: 11
             }
         };
 
@@ -751,6 +760,114 @@
                     </div>
                 </div>
             `,
+            contribution: `
+                <div class="page-content py-20 px-6 max-w-7xl mx-auto">
+                    <div class="text-center mb-16 reveal">
+                        <span class="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">Contribution Hub</span>
+                        <h1 class="text-5xl md:text-7xl font-bold mb-6">Give with <span class="text-gold italic">Purpose</span></h1>
+                        <p class="text-xl text-gray-400 max-w-3xl mx-auto">Build impact through a transparent contribution cart. Fund discipleship activities, club operations, and software maintenance in one secure checkout flow.</p>
+                    </div>
+
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <section class="lg:col-span-2 space-y-6">
+                            <div class="bg-white/5 border border-white/10 rounded-3xl p-8 reveal">
+                                <h3 class="text-2xl font-bold mb-3">Where your contribution goes</h3>
+                                <p class="text-gray-400 mb-6">Choose one or more causes and set quantity (each unit equals the amount shown).</p>
+                                <div class="space-y-4" id="contribution-catalog">
+                                    ${[
+                                        { id: 'discipleship', title: 'Discipleship Activities', amount: 500, desc: 'Weekly fellowship logistics, worship support, mentorship circles, and Bible study materials.' },
+                                        { id: 'community-impact', title: 'Community Outreach', amount: 1000, desc: 'School outreach transport, impact-day resources, and service project supplies.' },
+                                        { id: 'club-operations', title: 'Club Activities & Maintenance', amount: 1500, desc: 'Venue setup, sound needs, leadership training, and student activity coordination.' },
+                                        { id: 'software', title: 'Software & Platform Maintenance', amount: 2500, desc: 'Website hosting, domain renewals, security updates, forms, and digital communications.' }
+                                    ].map(item => `
+                                    <article class="border border-white/10 rounded-2xl p-5 bg-[#0a1128]">
+                                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                                            <div>
+                                                <h4 class="text-lg font-bold text-white">${item.title}</h4>
+                                                <p class="text-gray-400 text-sm mt-1">${item.desc}</p>
+                                                <p class="text-gold font-bold mt-3">KES ${item.amount.toLocaleString()} per unit</p>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <button class="qty-btn border border-white/20 rounded-lg px-3 py-1 text-lg" data-target="${item.id}" data-change="-1" type="button">−</button>
+                                                <span id="qty-${item.id}" class="w-10 text-center font-bold">0</span>
+                                                <button class="qty-btn border border-white/20 rounded-lg px-3 py-1 text-lg" data-target="${item.id}" data-change="1" type="button">+</button>
+                                            </div>
+                                        </div>
+                                    </article>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </section>
+
+                        <aside class="space-y-6">
+                            <div class="bg-[#050A18] border border-gold/20 p-6 rounded-3xl reveal sticky top-24">
+                                <h3 class="text-2xl font-bold mb-4">Checkout</h3>
+                                <div id="cart-items" class="space-y-3 text-sm text-gray-300 mb-4">
+                                    <p class="text-gray-500">Your cart is empty. Add causes to proceed.</p>
+                                </div>
+                                <div class="border-t border-white/10 pt-4 mb-4">
+                                    <div class="flex items-center justify-between text-lg font-bold">
+                                        <span>Total</span>
+                                        <span id="cart-total" class="text-gold">KES 0</span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <a id="paypal-checkout-link" target="_blank" rel="noopener" href="#" class="w-full btn-gold text-deep-navy font-bold py-3 rounded-xl flex items-center justify-center gap-2">
+                                        <i data-lucide="wallet" class="w-5 h-5"></i> Checkout with PayPal
+                                    </a>
+                                    <a id="card-checkout-link" target="_blank" rel="noopener" href="https://paystack.shop/pay/lifeshape-give-once" class="w-full border border-gold/40 text-gold font-bold py-3 rounded-xl hover:bg-gold/10 transition flex items-center justify-center gap-2">
+                                        <i data-lucide="credit-card" class="w-5 h-5"></i> Card / M-Pesa (Paystack)
+                                    </a>
+                                    <a id="monthly-card-checkout-link" target="_blank" rel="noopener" href="https://paystack.shop/pay/lifeshape-give-monthly" class="w-full border border-white/20 text-white font-bold py-3 rounded-xl hover:border-gold hover:text-gold transition flex items-center justify-center gap-2">
+                                        <i data-lucide="repeat" class="w-5 h-5"></i> Monthly Partner (Card)
+                                    </a>
+                                </div>
+
+                                <div class="mt-5 text-xs text-gray-500 space-y-2">
+                                    <p>PayPal receiver: <span class="text-gold">jaxmanro@gmail.com</span></p>
+                                    <p>Card options are available via PayPal guest checkout and Paystack secure pages.</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-[#050A18] border border-white/10 p-6 rounded-3xl reveal">
+                                <h4 class="text-xl font-bold mb-3">Money Order Details</h4>
+                                <p class="text-sm text-gray-400 mb-4">Create an order summary for finance records before checkout.</p>
+                                <form id="money-order-form" class="space-y-3">
+                                    <input id="order-name" type="text" required class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Full name">
+                                    <input id="order-email" type="email" required class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Email address">
+                                    <input id="order-phone" type="tel" required class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Phone / WhatsApp">
+                                    <select id="order-payment-method" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition">
+                                        <option value="paypal">PayPal</option>
+                                        <option value="card">Card / M-Pesa (Paystack)</option>
+                                        <option value="monthly">Monthly Partner (Card)</option>
+                                    </select>
+                                    <textarea id="order-notes" rows="2" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Notes (optional)"></textarea>
+
+                                    <div class="p-3 rounded-lg bg-white/5 border border-white/10">
+                                        <label class="flex items-center gap-2 text-sm text-white mb-2 cursor-pointer">
+                                            <input id="order-not-robot" type="checkbox" class="w-4 h-4 accent-[#D4AF37]">
+                                            <span>I'm not a robot</span>
+                                        </label>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            <p id="order-captcha-question" class="text-xs text-gray-400"></p>
+                                            <input id="order-captcha-answer" type="number" class="w-full bg-[#0a1128] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Captcha answer">
+                                        </div>
+                                    </div>
+
+                                    <p id="money-order-status" class="hidden text-xs rounded-lg px-3 py-2 border"></p>
+                                    <button type="submit" class="w-full btn-gold text-deep-navy font-bold py-3 rounded-xl">Place Money Order</button>
+                                </form>
+                                <div id="money-order-links" class="hidden mt-3 space-y-2 text-sm">
+                                    <a id="money-order-email-link" href="#" class="text-gold hover:underline block">Send order by email</a>
+                                    <a id="money-order-whatsapp-link" href="#" target="_blank" rel="noopener" class="text-gold hover:underline block">Send order by WhatsApp</a>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            `
+,
             contact: `
                 <div class="page-content py-20 px-6 max-w-5xl mx-auto">
                     <div class="text-center mb-16 reveal">
@@ -843,6 +960,18 @@
                                     <textarea name="interest" rows="3" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition resize-none" placeholder="E.g., I want to grow in my faith, find an accountability group..."></textarea>
                                 </div>
 
+                                <div class="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
+                                    <p class="text-sm font-bold text-gray-300 mb-3">CAPTCHA Verification</p>
+                                    <label class="flex items-center gap-2 text-sm text-white mb-3 cursor-pointer">
+                                        <input id="join-not-robot" type="checkbox" class="w-4 h-4 accent-[#D4AF37]">
+                                        <span>I'm not a robot</span>
+                                    </label>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <p id="join-captcha-question" class="text-xs text-gray-400"></p>
+                                        <input id="join-captcha-answer" type="number" class="w-full bg-[#0a1128] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Captcha answer">
+                                    </div>
+                                </div>
+
                                 <p id="form-status" class="hidden mb-6 text-sm rounded-lg px-4 py-3 border"></p>
                                 <button id="submit-btn" type="submit" class="w-full btn-gold text-deep-navy font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-2">
                                     <span id="submit-label">Submit Details</span>
@@ -852,29 +981,11 @@
 
                             <section class="bg-[#050A18] border border-gold/20 p-8 md:p-10 rounded-3xl shadow-2xl">
                                 <h3 class="text-2xl font-bold text-white mb-3">Support the Movement</h3>
-                                <p class="text-gray-400 mb-6">Inspired by simple giving models: choose a one-time gift or become a monthly partner.</p>
-
-                                <div class="grid sm:grid-cols-2 gap-3 mb-5">
-                                    <button class="giving-frequency-btn btn-gold text-deep-navy font-bold py-3 rounded-xl" data-frequency="once" type="button">One-Time Giving</button>
-                                    <button class="giving-frequency-btn border border-gold/30 text-gold font-bold py-3 rounded-xl hover:bg-gold/10 transition" data-frequency="monthly" type="button">Monthly Partner</button>
-                                </div>
-
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-                                    <button class="giving-amount-btn border border-white/10 text-white py-2 rounded-lg hover:border-gold hover:text-gold transition" data-amount="500" type="button">KES 500</button>
-                                    <button class="giving-amount-btn border border-white/10 text-white py-2 rounded-lg hover:border-gold hover:text-gold transition" data-amount="1000" type="button">KES 1,000</button>
-                                    <button class="giving-amount-btn border border-white/10 text-white py-2 rounded-lg hover:border-gold hover:text-gold transition" data-amount="2500" type="button">KES 2,500</button>
-                                    <button class="giving-amount-btn border border-white/10 text-white py-2 rounded-lg hover:border-gold hover:text-gold transition" data-amount="5000" type="button">KES 5,000</button>
-                                </div>
-
-                                <div class="mb-6">
-                                    <label for="custom-giving-amount" class="block text-sm font-bold text-gray-400 mb-2">Other Amount (KES)</label>
-                                    <input id="custom-giving-amount" type="number" min="100" step="50" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition" placeholder="Enter custom amount">
-                                </div>
-
-                                <a id="give-now-link" href="https://paystack.shop/pay/lifeshape-give-once" target="_blank" rel="noopener" class="w-full btn-gold text-deep-navy font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-2">
-                                    <span>Proceed to Secure Checkout</span>
-                                    <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
-                                </a>
+                                <p class="text-gray-400 mb-6">Use the full contribution cart and checkout flow for one-time gifts, projects, and monthly partnership.</p>
+                                <button onclick="navigateTo('contribution')" class="w-full btn-gold text-deep-navy font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-2" type="button">
+                                    <span>Open Contribution Checkout</span>
+                                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                                </button>
                                 <p class="text-xs text-gray-500 mt-4">Need help with giving? <a href="https://wa.me/254701279476" target="_blank" rel="noopener" class="text-gold hover:underline">Chat on WhatsApp</a>.</p>
                             </section>
                         </div>
@@ -913,7 +1024,7 @@
 
                 // Re-bind contact form when contact page is rendered
                 initRegistrationForm();
-                initGivingWidget();
+                initContributionCart();
             }, 200); // match roughly with a short fade duration
         }
 
@@ -964,6 +1075,22 @@
             const submitBtn = document.getElementById('submit-btn');
             const submitLabel = document.getElementById('submit-label');
             const statusBox = document.getElementById('form-status');
+            const notRobot = document.getElementById('join-not-robot');
+            const captchaQuestion = document.getElementById('join-captcha-question');
+            const captchaAnswer = document.getElementById('join-captcha-answer');
+            let expectedCaptchaAnswer = null;
+
+            const setupCaptcha = () => {
+                const min = SITE_CONFIG.captcha.minNumber;
+                const max = SITE_CONFIG.captcha.maxNumber;
+                const a = Math.floor(Math.random() * (max - min + 1)) + min;
+                const b = Math.floor(Math.random() * (max - min + 1)) + min;
+                expectedCaptchaAnswer = a + b;
+                if (captchaQuestion) captchaQuestion.textContent = `Solve: ${a} + ${b}`;
+                if (captchaAnswer) captchaAnswer.value = '';
+                if (notRobot) notRobot.checked = false;
+            };
+            setupCaptcha();
 
             const showStatus = (message, isSuccess = true) => {
                 statusBox.classList.remove('hidden', 'border-red-400/40', 'text-red-300', 'bg-red-900/20', 'border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
@@ -977,6 +1104,14 @@
 
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
+
+                const humanConfirmed = Boolean(notRobot?.checked);
+                const answerIsValid = Number(captchaAnswer?.value) === expectedCaptchaAnswer;
+                if (!humanConfirmed || !answerIsValid) {
+                    showStatus('Please complete CAPTCHA verification correctly before submitting.', false);
+                    setupCaptcha();
+                    return;
+                }
 
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
@@ -1007,63 +1142,150 @@
                     submitBtn.disabled = false;
                     submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
                     submitLabel.textContent = 'Submit Details';
+                    setupCaptcha();
                 }
             });
         }
 
-        function initGivingWidget() {
-            const checkoutLink = document.getElementById('give-now-link');
-            if (!checkoutLink) return;
+        function initContributionCart() {
+            const cartContainer = document.getElementById('cart-items');
+            if (!cartContainer) return;
 
-            const frequencyButtons = document.querySelectorAll('.giving-frequency-btn');
-            const amountButtons = document.querySelectorAll('.giving-amount-btn');
-            const customAmountInput = document.getElementById('custom-giving-amount');
-
-            let selectedFrequency = 'once';
-            let selectedAmount = '';
-
-            const getBaseLink = () => selectedFrequency === 'monthly' ? SITE_CONFIG.payments.monthlyLink : SITE_CONFIG.payments.oneTimeLink;
-
-            const updateCheckoutLink = () => {
-                const base = getBaseLink();
-                const customAmount = customAmountInput?.value?.trim();
-                const amount = customAmount || selectedAmount;
-                checkoutLink.href = amount ? `${base}?amount=${encodeURIComponent(amount)}&currency=${SITE_CONFIG.payments.currency}` : base;
+            const catalog = {
+                'discipleship': { title: 'Discipleship Activities', amount: 500 },
+                'community-impact': { title: 'Community Outreach', amount: 1000 },
+                'club-operations': { title: 'Club Activities & Maintenance', amount: 1500 },
+                'software': { title: 'Software & Platform Maintenance', amount: 2500 }
             };
 
-            frequencyButtons.forEach(btn => {
+            const quantities = Object.fromEntries(Object.keys(catalog).map(key => [key, 0]));
+            const totalLabel = document.getElementById('cart-total');
+            const paypalLink = document.getElementById('paypal-checkout-link');
+            const cardLink = document.getElementById('card-checkout-link');
+            const monthlyCardLink = document.getElementById('monthly-card-checkout-link');
+            const orderForm = document.getElementById('money-order-form');
+            const orderStatus = document.getElementById('money-order-status');
+            const orderEmailLink = document.getElementById('money-order-email-link');
+            const orderWhatsAppLink = document.getElementById('money-order-whatsapp-link');
+            const orderLinksWrap = document.getElementById('money-order-links');
+            const orderNotRobot = document.getElementById('order-not-robot');
+            const orderCaptchaQuestion = document.getElementById('order-captcha-question');
+            const orderCaptchaAnswer = document.getElementById('order-captcha-answer');
+            let orderCaptchaExpected = null;
+
+            const formatKES = (value) => `KES ${value.toLocaleString()}`;
+
+            const buildPayPalLink = (amount) => {
+                const params = new URLSearchParams({
+                    cmd: '_xclick',
+                    business: SITE_CONFIG.payments.paypalReceiver,
+                    item_name: 'LifeShape Club Contribution',
+                    currency_code: SITE_CONFIG.payments.currency,
+                    amount: amount > 0 ? String(amount) : '0'
+                });
+                return `${SITE_CONFIG.payments.paypalCheckoutBase}?${params.toString()}`;
+            };
+
+            const setupOrderCaptcha = () => {
+                const min = SITE_CONFIG.captcha.minNumber;
+                const max = SITE_CONFIG.captcha.maxNumber;
+                const a = Math.floor(Math.random() * (max - min + 1)) + min;
+                const b = Math.floor(Math.random() * (max - min + 1)) + min;
+                orderCaptchaExpected = a + b;
+                if (orderCaptchaQuestion) orderCaptchaQuestion.textContent = `Solve: ${a} + ${b}`;
+                if (orderCaptchaAnswer) orderCaptchaAnswer.value = '';
+                if (orderNotRobot) orderNotRobot.checked = false;
+            };
+
+            const render = () => {
+                const selected = Object.entries(quantities).filter(([, qty]) => qty > 0);
+                const total = selected.reduce((sum, [id, qty]) => sum + (catalog[id].amount * qty), 0);
+
+                selected.forEach(([id, qty]) => {
+                    const qtyNode = document.getElementById(`qty-${id}`);
+                    if (qtyNode) qtyNode.textContent = String(qty);
+                });
+                Object.entries(quantities).filter(([, qty]) => qty === 0).forEach(([id]) => {
+                    const qtyNode = document.getElementById(`qty-${id}`);
+                    if (qtyNode) qtyNode.textContent = '0';
+                });
+
+                if (selected.length === 0) {
+                    cartContainer.innerHTML = '<p class="text-gray-500">Your cart is empty. Add causes to proceed.</p>';
+                } else {
+                    cartContainer.innerHTML = selected.map(([id, qty]) => {
+                        const lineTotal = catalog[id].amount * qty;
+                        return `<div class="flex items-center justify-between"><span>${catalog[id].title} × ${qty}</span><span class="text-gold">${formatKES(lineTotal)}</span></div>`;
+                    }).join('');
+                }
+
+                totalLabel.textContent = formatKES(total);
+                paypalLink.href = buildPayPalLink(total);
+                cardLink.href = SITE_CONFIG.payments.cardCheckoutLink;
+                monthlyCardLink.href = SITE_CONFIG.payments.monthlyCardCheckoutLink;
+            };
+
+            document.querySelectorAll('.qty-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    selectedFrequency = btn.dataset.frequency || 'once';
-                    frequencyButtons.forEach(item => {
-                        item.classList.remove('btn-gold', 'text-deep-navy');
-                        item.classList.add('border', 'border-gold/30', 'text-gold');
-                    });
-                    btn.classList.remove('border', 'border-gold/30', 'text-gold');
-                    btn.classList.add('btn-gold', 'text-deep-navy');
-                    updateCheckoutLink();
+                    const id = btn.dataset.target;
+                    const delta = Number(btn.dataset.change || 0);
+                    if (!id || !catalog[id]) return;
+                    quantities[id] = Math.max(0, quantities[id] + delta);
+                    render();
                 });
             });
 
-            amountButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    selectedAmount = btn.dataset.amount || '';
-                    if (customAmountInput) customAmountInput.value = '';
-                    amountButtons.forEach(item => item.classList.remove('border-gold', 'text-gold', 'bg-gold/10'));
-                    btn.classList.add('border-gold', 'text-gold', 'bg-gold/10');
-                    updateCheckoutLink();
-                });
-            });
-
-            if (customAmountInput) {
-                customAmountInput.addEventListener('input', () => {
-                    if (customAmountInput.value) {
-                        amountButtons.forEach(item => item.classList.remove('border-gold', 'text-gold', 'bg-gold/10'));
+            if (orderForm) {
+                setupOrderCaptcha();
+                orderForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    const total = Object.entries(quantities).reduce((sum, [id, qty]) => sum + (catalog[id].amount * qty), 0);
+                    if (total <= 0) {
+                        orderStatus.classList.remove('hidden', 'border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                        orderStatus.classList.add('border-red-400/40', 'text-red-300', 'bg-red-900/20');
+                        orderStatus.textContent = 'Add at least one contribution item to create an order.';
+                        return;
                     }
-                    updateCheckoutLink();
+
+                    const captchaValid = Boolean(orderNotRobot?.checked) && Number(orderCaptchaAnswer?.value) === orderCaptchaExpected;
+                    if (!captchaValid) {
+                        orderStatus.classList.remove('hidden', 'border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                        orderStatus.classList.add('border-red-400/40', 'text-red-300', 'bg-red-900/20');
+                        orderStatus.textContent = 'Please complete CAPTCHA correctly before placing order.';
+                        setupOrderCaptcha();
+                        return;
+                    }
+
+                    const name = document.getElementById('order-name')?.value?.trim();
+                    const email = document.getElementById('order-email')?.value?.trim();
+                    const phone = document.getElementById('order-phone')?.value?.trim();
+                    const notes = document.getElementById('order-notes')?.value?.trim() || 'N/A';
+                    const paymentMethod = document.getElementById('order-payment-method')?.value || 'paypal';
+                    const ref = `LS-${Date.now().toString().slice(-8)}`;
+
+                    const selected = Object.entries(quantities).filter(([, qty]) => qty > 0).map(([id, qty]) => `${catalog[id].title} x${qty}`).join(', ');
+                    const summary = `LifeShape Money Order
+Ref: ${ref}
+Name: ${name}
+Email: ${email}
+Phone: ${phone}
+Items: ${selected}
+Total: ${formatKES(total)}
+Payment: ${paymentMethod}
+Notes: ${notes}`;
+
+                    orderEmailLink.href = `mailto:${SITE_CONFIG.contactEmail}?subject=${encodeURIComponent(`Money Order ${ref}`)}&body=${encodeURIComponent(summary)}`;
+                    orderWhatsAppLink.href = `https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent(summary)}`;
+                    orderLinksWrap.classList.remove('hidden');
+
+                    orderStatus.classList.remove('hidden', 'border-red-400/40', 'text-red-300', 'bg-red-900/20');
+                    orderStatus.classList.add('border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                    orderStatus.textContent = `Order ${ref} created. Send it via email/WhatsApp then complete payment.`;
+                    setupOrderCaptcha();
                 });
             }
 
-            updateCheckoutLink();
+            render();
         }
 
         // Initialize App on Load
@@ -1079,7 +1301,7 @@
 
             // Initialize form handler for default page load if needed
             initRegistrationForm();
-            initGivingWidget();
+            initContributionCart();
         });
     </script>
 </body>
