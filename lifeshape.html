@@ -249,6 +249,10 @@
                 paypalCheckoutBase: 'https://www.paypal.com/cgi-bin/webscr',
                 cardCheckoutLink: 'https://paystack.shop/pay/lifeshape-give-once',
                 monthlyCardCheckoutLink: 'https://paystack.shop/pay/lifeshape-give-monthly'
+            },
+            captcha: {
+                minNumber: 2,
+                maxNumber: 11
             }
         };
 
@@ -825,6 +829,41 @@
                                     <p>Card options are available via PayPal guest checkout and Paystack secure pages.</p>
                                 </div>
                             </div>
+
+                            <div class="bg-[#050A18] border border-white/10 p-6 rounded-3xl reveal">
+                                <h4 class="text-xl font-bold mb-3">Money Order Details</h4>
+                                <p class="text-sm text-gray-400 mb-4">Create an order summary for finance records before checkout.</p>
+                                <form id="money-order-form" class="space-y-3">
+                                    <input id="order-name" type="text" required class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Full name">
+                                    <input id="order-email" type="email" required class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Email address">
+                                    <input id="order-phone" type="tel" required class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Phone / WhatsApp">
+                                    <select id="order-payment-method" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition">
+                                        <option value="paypal">PayPal</option>
+                                        <option value="card">Card / M-Pesa (Paystack)</option>
+                                        <option value="monthly">Monthly Partner (Card)</option>
+                                    </select>
+                                    <textarea id="order-notes" rows="2" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Notes (optional)"></textarea>
+                                    <p id="money-order-line-items" class="text-xs text-gray-400">Order items: none selected yet.</p>
+
+                                    <div class="p-3 rounded-lg bg-white/5 border border-white/10">
+                                        <label class="flex items-center gap-2 text-sm text-white mb-2 cursor-pointer">
+                                            <input id="order-not-robot" type="checkbox" class="w-4 h-4 accent-[#D4AF37]">
+                                            <span>I'm not a robot</span>
+                                        </label>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            <p id="order-captcha-question" class="text-xs text-gray-400"></p>
+                                            <input id="order-captcha-answer" type="number" class="w-full bg-[#0a1128] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Captcha answer">
+                                        </div>
+                                    </div>
+
+                                    <p id="money-order-status" class="hidden text-xs rounded-lg px-3 py-2 border"></p>
+                                    <button id="money-order-submit" type="submit" class="w-full btn-gold text-deep-navy font-bold py-3 rounded-xl">Place Money Order</button>
+                                </form>
+                                <div id="money-order-links" class="hidden mt-3 space-y-2 text-sm">
+                                    <a id="money-order-email-link" href="#" class="text-gold hover:underline block">Send order by email</a>
+                                    <a id="money-order-whatsapp-link" href="#" target="_blank" rel="noopener" class="text-gold hover:underline block">Send order by WhatsApp</a>
+                                </div>
+                            </div>
                         </aside>
                     </div>
                 </div>
@@ -920,6 +959,18 @@
                                 <div class="mb-8">
                                     <label class="block text-sm font-bold text-gray-400 mb-2">What are you looking for? (Optional)</label>
                                     <textarea name="interest" rows="3" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition resize-none" placeholder="E.g., I want to grow in my faith, find an accountability group..."></textarea>
+                                </div>
+
+                                <div class="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
+                                    <p class="text-sm font-bold text-gray-300 mb-3">CAPTCHA Verification</p>
+                                    <label class="flex items-center gap-2 text-sm text-white mb-3 cursor-pointer">
+                                        <input id="join-not-robot" type="checkbox" class="w-4 h-4 accent-[#D4AF37]">
+                                        <span>I'm not a robot</span>
+                                    </label>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <p id="join-captcha-question" class="text-xs text-gray-400"></p>
+                                        <input id="join-captcha-answer" type="number" class="w-full bg-[#0a1128] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Captcha answer">
+                                    </div>
                                 </div>
 
                                 <p id="form-status" class="hidden mb-6 text-sm rounded-lg px-4 py-3 border"></p>
@@ -1025,6 +1076,22 @@
             const submitBtn = document.getElementById('submit-btn');
             const submitLabel = document.getElementById('submit-label');
             const statusBox = document.getElementById('form-status');
+            const notRobot = document.getElementById('join-not-robot');
+            const captchaQuestion = document.getElementById('join-captcha-question');
+            const captchaAnswer = document.getElementById('join-captcha-answer');
+            let expectedCaptchaAnswer = null;
+
+            const setupCaptcha = () => {
+                const min = SITE_CONFIG.captcha.minNumber;
+                const max = SITE_CONFIG.captcha.maxNumber;
+                const a = Math.floor(Math.random() * (max - min + 1)) + min;
+                const b = Math.floor(Math.random() * (max - min + 1)) + min;
+                expectedCaptchaAnswer = a + b;
+                if (captchaQuestion) captchaQuestion.textContent = `Solve: ${a} + ${b}`;
+                if (captchaAnswer) captchaAnswer.value = '';
+                if (notRobot) notRobot.checked = false;
+            };
+            setupCaptcha();
 
             const showStatus = (message, isSuccess = true) => {
                 statusBox.classList.remove('hidden', 'border-red-400/40', 'text-red-300', 'bg-red-900/20', 'border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
@@ -1038,6 +1105,14 @@
 
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
+
+                const humanConfirmed = Boolean(notRobot?.checked);
+                const answerIsValid = Number(captchaAnswer?.value) === expectedCaptchaAnswer;
+                if (!humanConfirmed || !answerIsValid) {
+                    showStatus('Please complete CAPTCHA verification correctly before submitting.', false);
+                    setupCaptcha();
+                    return;
+                }
 
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
@@ -1068,6 +1143,7 @@
                     submitBtn.disabled = false;
                     submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
                     submitLabel.textContent = 'Submit Details';
+                    setupCaptcha();
                 }
             });
         }
@@ -1088,6 +1164,17 @@
             const paypalLink = document.getElementById('paypal-checkout-link');
             const cardLink = document.getElementById('card-checkout-link');
             const monthlyCardLink = document.getElementById('monthly-card-checkout-link');
+            const orderForm = document.getElementById('money-order-form');
+            const orderStatus = document.getElementById('money-order-status');
+            const orderEmailLink = document.getElementById('money-order-email-link');
+            const orderWhatsAppLink = document.getElementById('money-order-whatsapp-link');
+            const orderLinksWrap = document.getElementById('money-order-links');
+            const orderLineItems = document.getElementById('money-order-line-items');
+            const orderSubmitBtn = document.getElementById('money-order-submit');
+            const orderNotRobot = document.getElementById('order-not-robot');
+            const orderCaptchaQuestion = document.getElementById('order-captcha-question');
+            const orderCaptchaAnswer = document.getElementById('order-captcha-answer');
+            let orderCaptchaExpected = null;
 
             const formatKES = (value) => `KES ${value.toLocaleString()}`;
 
@@ -1100,6 +1187,17 @@
                     amount: amount > 0 ? String(amount) : '0'
                 });
                 return `${SITE_CONFIG.payments.paypalCheckoutBase}?${params.toString()}`;
+            };
+
+            const setupOrderCaptcha = () => {
+                const min = SITE_CONFIG.captcha.minNumber;
+                const max = SITE_CONFIG.captcha.maxNumber;
+                const a = Math.floor(Math.random() * (max - min + 1)) + min;
+                const b = Math.floor(Math.random() * (max - min + 1)) + min;
+                orderCaptchaExpected = a + b;
+                if (orderCaptchaQuestion) orderCaptchaQuestion.textContent = `Solve: ${a} + ${b}`;
+                if (orderCaptchaAnswer) orderCaptchaAnswer.value = '';
+                if (orderNotRobot) orderNotRobot.checked = false;
             };
 
             const render = () => {
@@ -1117,11 +1215,24 @@
 
                 if (selected.length === 0) {
                     cartContainer.innerHTML = '<p class="text-gray-500">Your cart is empty. Add causes to proceed.</p>';
+                    if (orderLineItems) orderLineItems.textContent = 'Order items: none selected yet.';
+                    if (orderSubmitBtn) {
+                        orderSubmitBtn.disabled = true;
+                        orderSubmitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                    }
                 } else {
                     cartContainer.innerHTML = selected.map(([id, qty]) => {
                         const lineTotal = catalog[id].amount * qty;
                         return `<div class="flex items-center justify-between"><span>${catalog[id].title} × ${qty}</span><span class="text-gold">${formatKES(lineTotal)}</span></div>`;
                     }).join('');
+                    if (orderLineItems) {
+                        const itemSummary = selected.map(([id, qty]) => `${catalog[id].title} x${qty}`).join(', ');
+                        orderLineItems.textContent = `Order items: ${itemSummary}.`;
+                    }
+                    if (orderSubmitBtn) {
+                        orderSubmitBtn.disabled = false;
+                        orderSubmitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                    }
                 }
 
                 totalLabel.textContent = formatKES(total);
@@ -1139,6 +1250,56 @@
                     render();
                 });
             });
+
+            if (orderForm) {
+                setupOrderCaptcha();
+                orderForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    const total = Object.entries(quantities).reduce((sum, [id, qty]) => sum + (catalog[id].amount * qty), 0);
+                    if (total <= 0) {
+                        orderStatus.classList.remove('hidden', 'border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                        orderStatus.classList.add('border-red-400/40', 'text-red-300', 'bg-red-900/20');
+                        orderStatus.textContent = 'Add at least one contribution item to create an order.';
+                        return;
+                    }
+
+                    const captchaValid = Boolean(orderNotRobot?.checked) && Number(orderCaptchaAnswer?.value) === orderCaptchaExpected;
+                    if (!captchaValid) {
+                        orderStatus.classList.remove('hidden', 'border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                        orderStatus.classList.add('border-red-400/40', 'text-red-300', 'bg-red-900/20');
+                        orderStatus.textContent = 'Please complete CAPTCHA correctly before placing order.';
+                        setupOrderCaptcha();
+                        return;
+                    }
+
+                    const name = document.getElementById('order-name')?.value?.trim();
+                    const email = document.getElementById('order-email')?.value?.trim();
+                    const phone = document.getElementById('order-phone')?.value?.trim();
+                    const notes = document.getElementById('order-notes')?.value?.trim() || 'N/A';
+                    const paymentMethod = document.getElementById('order-payment-method')?.value || 'paypal';
+                    const ref = `LS-${Date.now().toString().slice(-8)}`;
+
+                    const selected = Object.entries(quantities).filter(([, qty]) => qty > 0).map(([id, qty]) => `${catalog[id].title} x${qty}`).join(', ');
+                    const summary = `LifeShape Money Order
+Ref: ${ref}
+Name: ${name}
+Email: ${email}
+Phone: ${phone}
+Items: ${selected}
+Total: ${formatKES(total)}
+Payment: ${paymentMethod}
+Notes: ${notes}`;
+
+                    orderEmailLink.href = `mailto:${SITE_CONFIG.contactEmail}?subject=${encodeURIComponent(`Money Order ${ref}`)}&body=${encodeURIComponent(summary)}`;
+                    orderWhatsAppLink.href = `https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent(summary)}`;
+                    orderLinksWrap.classList.remove('hidden');
+
+                    orderStatus.classList.remove('hidden', 'border-red-400/40', 'text-red-300', 'bg-red-900/20');
+                    orderStatus.classList.add('border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                    orderStatus.textContent = `Order ${ref} created. Send it via email/WhatsApp then complete payment.`;
+                    setupOrderCaptcha();
+                });
+            }
 
             render();
         }
