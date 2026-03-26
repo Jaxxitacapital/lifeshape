@@ -153,6 +153,7 @@
                 <button onclick="navigateTo('about')" class="nav-link" id="nav-about">About</button>
                 <button onclick="navigateTo('events')" class="nav-link" id="nav-events">Events</button>
                 <button onclick="navigateTo('resources')" class="nav-link" id="nav-resources">Resources</button>
+                <button onclick="navigateTo('news')" class="nav-link" id="nav-news">News & Blog</button>
                 <button onclick="navigateTo('contribution')" class="nav-link" id="nav-contribution">Contribution</button>
                 <button onclick="navigateTo('contact')" class="btn-gold px-6 py-2.5 rounded-full text-deep-navy font-bold ml-4" id="nav-contact">Join Now</button>
             </div>
@@ -173,6 +174,7 @@
         <button onclick="navigateTo('about'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">About Us</button>
         <button onclick="navigateTo('events'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">Events</button>
         <button onclick="navigateTo('resources'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">Resources</button>
+        <button onclick="navigateTo('news'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">News & Blog</button>
         <button onclick="navigateTo('contribution'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">Contribution</button>
         <button onclick="navigateTo('contact'); toggleMenu();" class="btn-gold px-8 py-3 rounded-full text-deep-navy font-bold mt-4">Join Movement</button>
     </div>
@@ -208,6 +210,7 @@
                     <li><button onclick="navigateTo('about')" class="hover:text-gold transition">About Us</button></li>
                     <li><button onclick="navigateTo('events')" class="hover:text-gold transition">Upcoming Events</button></li>
                     <li><button onclick="navigateTo('resources')" class="hover:text-gold transition">Growth Resources</button></li>
+                    <li><button onclick="navigateTo('news')" class="hover:text-gold transition">News & Blog</button></li>
                     <li><button onclick="navigateTo('contribution')" class="hover:text-gold transition">Contribution & Checkout</button></li>
                     <li><button onclick="navigateTo('contact')" class="hover:text-gold transition">Contact Leadership</button></li>
                 </ul>
@@ -253,6 +256,33 @@
             captcha: {
                 minNumber: 2,
                 maxNumber: 11
+            },
+            news: {
+                sources: [
+                    'https://kabarak.ac.ke/partnerships',
+                    'https://kabarak.ac.ke/smhs-news',
+                    'https://kabarak.ac.ke/news'
+                ],
+                fallback: [
+                    {
+                        title: 'LifeShape USA and Kenya Project Teams Explore Strategic Partnership with Kabarak University',
+                        date: 'September 11, 2025',
+                        summary: 'Courtesy call explored collaboration pillars in health, education, TVET, outreach, and internships.',
+                        link: 'https://kabarak.ac.ke/smhs-news/lifeshape-usa-and-kenya-project-teams-explore-strategic-partnership-with-kabu'
+                    },
+                    {
+                        title: 'Kabarak University Signs MoU with KIMC to Strengthen Media and Communication Education in Kenya',
+                        date: 'March 25, 2026',
+                        summary: 'Strategic MoU under the partnerships portfolio to strengthen media and communication training.',
+                        link: 'https://kabarak.ac.ke/partnerships'
+                    },
+                    {
+                        title: 'Kabarak University Explores Strategic Partnership Opportunities with I&M Bank Kenya',
+                        date: 'February 10, 2026',
+                        summary: 'Engagement focused on institutional growth, financial sustainability, and collaborative development support.',
+                        link: 'https://kabarak.ac.ke/partnerships'
+                    }
+                ]
             }
         };
 
@@ -760,6 +790,43 @@
                     </div>
                 </div>
             `,
+            news: `
+                <div class="page-content py-20 px-6 max-w-7xl mx-auto">
+                    <div class="text-center mb-14 reveal">
+                        <span class="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">Latest Updates</span>
+                        <h1 class="text-5xl md:text-7xl font-bold mb-6">News & <span class="text-gold italic">Blogs</span></h1>
+                        <p class="text-xl text-gray-400 max-w-4xl mx-auto">Track the latest LifeShape-Kabarak partnership updates, health and education milestones, and institutional collaboration stories.</p>
+                    </div>
+
+                    <section class="bg-white/5 border border-gold/20 rounded-3xl p-8 mb-10 reveal">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-4">Strategic Evolution of Institutional Linkages</h2>
+                        <p class="text-gray-300 leading-relaxed">This partnership framework connects Kabarak University's academic and leadership ecosystem with LifeShape International's community mission model across healthcare, teacher retooling, TVET progression, and mission outreach. Use the live feed below to monitor current progress and official institutional announcements.</p>
+                    </section>
+
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold">Live Partnership Feed</h3>
+                        <button id="refresh-news" type="button" class="border border-gold/40 text-gold px-4 py-2 rounded-lg hover:bg-gold/10 transition text-sm font-bold">Refresh feed</button>
+                    </div>
+                    <div id="news-feed-status" class="text-sm text-gray-400 mb-4">Loading latest news...</div>
+                    <div id="news-feed-list" class="grid md:grid-cols-2 gap-6">
+                        <article class="bg-[#0a1128] border border-white/10 rounded-2xl p-6">
+                            <p class="text-xs uppercase tracking-widest mb-2 text-amber-300">Fallback</p>
+                            <h4 class="text-xl font-bold mb-2">LifeShape USA and Kenya Project Teams Explore Strategic Partnership with Kabarak University</h4>
+                            <p class="text-xs text-gray-500 mb-3">September 11, 2025</p>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-4">Courtesy call explored collaboration pillars in health, education, TVET, outreach, and internships.</p>
+                            <a href="https://kabarak.ac.ke/smhs-news/lifeshape-usa-and-kenya-project-teams-explore-strategic-partnership-with-kabu" target="_blank" rel="noopener" class="text-gold font-bold text-sm hover:underline">Read full article</a>
+                        </article>
+                        <article class="bg-[#0a1128] border border-white/10 rounded-2xl p-6">
+                            <p class="text-xs uppercase tracking-widest mb-2 text-amber-300">Fallback</p>
+                            <h4 class="text-xl font-bold mb-2">Kabarak University Signs MoU with KIMC to Strengthen Media and Communication Education in Kenya</h4>
+                            <p class="text-xs text-gray-500 mb-3">March 25, 2026</p>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-4">Strategic MoU under the partnerships portfolio to strengthen media and communication training.</p>
+                            <a href="https://kabarak.ac.ke/partnerships" target="_blank" rel="noopener" class="text-gold font-bold text-sm hover:underline">Read full article</a>
+                        </article>
+                    </div>
+                </div>
+            `
+,
             contribution: `
                 <div class="page-content py-20 px-6 max-w-7xl mx-auto">
                     <div class="text-center mb-16 reveal">
@@ -1026,6 +1093,7 @@
                 // Re-bind contact form when contact page is rendered
                 initRegistrationForm();
                 initContributionCart();
+                initNewsHub();
             }, 200); // match roughly with a short fade duration
         }
 
@@ -1067,6 +1135,87 @@
                     }
                 });
             }, 100);
+        }
+
+        async function initNewsHub() {
+            const list = document.getElementById('news-feed-list');
+            const status = document.getElementById('news-feed-status');
+            const refreshBtn = document.getElementById('refresh-news');
+            if (!list || !status) return;
+
+            const renderNews = (items, isFallback = false) => {
+                list.innerHTML = items.map(article => `
+                    <article class="bg-[#0a1128] border border-white/10 rounded-2xl p-6">
+                        <p class="text-xs uppercase tracking-widest mb-2 ${isFallback ? 'text-amber-300' : 'text-emerald-300'}">${isFallback ? 'Backup source' : 'Live source'}</p>
+                        <h4 class="text-xl font-bold mb-2">${article.title}</h4>
+                        <p class="text-xs text-gray-500 mb-3">${article.date || 'Recent update'}</p>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-4">${article.summary || 'Read full update from Kabarak University.'}</p>
+                        <a href="${article.link}" target="_blank" rel="noopener" class="text-gold font-bold text-sm hover:underline">Read full article</a>
+                    </article>
+                `).join('');
+            };
+
+            const parseArticles = (html, sourceUrl) => {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const anchors = [...doc.querySelectorAll('a[href]')];
+                const mapped = anchors
+                    .filter(a => /kabarak\.ac\.ke\/(smhs-news|partnerships|news)/.test(a.href) && a.textContent.trim().length > 30)
+                    .slice(0, 20)
+                    .map(a => ({
+                        title: a.textContent.trim(),
+                        link: a.href,
+                        date: 'Latest from Kabarak',
+                        summary: `Source: ${sourceUrl}`
+                    }));
+
+                const dedup = [];
+                const seen = new Set();
+                for (const item of mapped) {
+                    if (seen.has(item.link)) continue;
+                    seen.add(item.link);
+                    dedup.push(item);
+                    if (dedup.length >= 6) break;
+                }
+                return dedup;
+            };
+
+            const loadLive = async () => {
+                const requests = SITE_CONFIG.news.sources.map(async (source) => {
+                    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(source)}`;
+                    const response = await fetch(proxy, { cache: 'no-store' });
+                    if (!response.ok) throw new Error(`Failed source: ${source}`);
+                    const html = await response.text();
+                    return parseArticles(html, source);
+                });
+
+                const settled = await Promise.allSettled(requests);
+                const articles = settled.flatMap(item => item.status === 'fulfilled' ? item.value : []);
+                return articles.slice(0, 6);
+            };
+
+            const refresh = async () => {
+                status.textContent = 'Loading latest news...';
+                try {
+                    const liveArticles = await loadLive();
+                    if (liveArticles.length > 0) {
+                        renderNews(liveArticles, false);
+                        status.textContent = `Showing ${liveArticles.length} live updates from Kabarak news sources.`;
+                    } else {
+                        renderNews(SITE_CONFIG.news.fallback, true);
+                        status.textContent = 'Live fetch returned no items. Showing verified fallback updates.';
+                    }
+                } catch (error) {
+                    renderNews(SITE_CONFIG.news.fallback, true);
+                    status.textContent = 'Could not fetch live feed right now. Showing verified fallback updates.';
+                }
+            };
+
+            if (refreshBtn && !refreshBtn.dataset.bound) {
+                refreshBtn.dataset.bound = 'true';
+                refreshBtn.addEventListener('click', refresh);
+            }
+
+            refresh();
         }
 
         function initRegistrationForm() {
@@ -1318,6 +1467,7 @@ Notes: ${notes}`;
             // Initialize form handler for default page load if needed
             initRegistrationForm();
             initContributionCart();
+            initNewsHub();
         });
     </script>
 </body>
