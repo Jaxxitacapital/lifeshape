@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeShape Club | Kabarak University</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use vanilla Lucide instead of React version for plain HTML -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+
+        :root {
+            --deep-navy: #050A18;
+            --soft-white: #F8FAFC;
+            --gold: #D4AF37;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--deep-navy);
+            color: var(--soft-white);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, .brand-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .text-gold { color: var(--gold); }
+        .bg-gold { background-color: var(--gold); }
+        .border-gold { border-color: var(--gold); }
+
+        .glass-nav {
+            background: rgba(5, 10, 24, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.1) 0%, rgba(5, 10, 24, 1) 70%);
+        }
+
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.3);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gold-glow {
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Page Transition Animation */
+        .page-content {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--gold);
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold) 0%, #b8860b 100%);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-gold:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Mobile Menu */
+        #mobile-menu {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100%);
+        }
+
+        #mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        /* Hide scrollbar for cleaner look but allow scrolling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--deep-navy);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(212, 175, 55, 0.6);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="navigateTo('home')">
+                <div class="w-10 h-10 border-2 border-gold flex items-center justify-center rounded-full group-hover:bg-gold/10 transition">
+                    <span class="text-gold font-bold text-sm">LS</span>
+                </div>
+                <span class="text-xl font-bold tracking-wider brand-font">LifeShape <span class="text-gold">KABU</span></span>
+            </div>
+
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex gap-8 items-center font-medium uppercase text-xs tracking-widest">
+                <button onclick="navigateTo('home')" class="nav-link active" id="nav-home">Home</button>
+                <button onclick="navigateTo('about')" class="nav-link" id="nav-about">About</button>
+                <button onclick="navigateTo('events')" class="nav-link" id="nav-events">Events</button>
+                <button onclick="navigateTo('resources')" class="nav-link" id="nav-resources">Resources</button>
+                <button onclick="navigateTo('contribution')" class="nav-link" id="nav-contribution">Contribution</button>
+                <button onclick="navigateTo('contact')" class="btn-gold px-6 py-2.5 rounded-full text-deep-navy font-bold ml-4" id="nav-contact">Join Now</button>
+            </div>
+
+            <!-- Mobile Toggle -->
+            <button class="md:hidden text-gold hover:text-white transition" onclick="toggleMenu()">
+                <i data-lucide="menu" class="w-8 h-8"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Sidebar -->
+    <div id="mobile-menu" class="fixed inset-0 bg-deep-navy/95 backdrop-blur-xl z-[60] flex flex-col items-center justify-center gap-8 md:hidden">
+        <button class="absolute top-6 right-6 text-gold hover:text-white transition" onclick="toggleMenu()">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </button>
+        <button onclick="navigateTo('home'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">Home</button>
+        <button onclick="navigateTo('about'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">About Us</button>
+        <button onclick="navigateTo('events'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">Events</button>
+        <button onclick="navigateTo('resources'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">Resources</button>
+        <button onclick="navigateTo('contribution'); toggleMenu();" class="text-2xl brand-font hover:text-gold transition">Contribution</button>
+        <button onclick="navigateTo('contact'); toggleMenu();" class="btn-gold px-8 py-3 rounded-full text-deep-navy font-bold mt-4">Join Movement</button>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main id="app-content" class="flex-grow pt-20">
+        <!-- Content injected by JavaScript -->
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-black border-t border-gold/10 py-16 px-6 mt-auto">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
+            <div class="col-span-2">
+                <div class="flex items-center gap-2 mb-6 cursor-pointer" onclick="navigateTo('home')">
+                    <div class="w-8 h-8 border border-gold flex items-center justify-center rounded-full">
+                        <span class="text-gold text-xs font-bold">LS</span>
+                    </div>
+                    <span class="text-2xl font-bold tracking-wider brand-font">LifeShape <span class="text-gold">KABU</span></span>
+                </div>
+                <p class="text-gray-400 max-w-md leading-relaxed">
+                    A Christ-centered student movement at Kabarak University. We believe in shaping lives through purposeful discipleship, intentional growth, and visionary leadership.
+                </p>
+                <div class="mt-8 flex gap-4">
+                    <a href="https://instagram.com/lifeshapekabu" target="_blank" rel="noopener" aria-label="LifeShape KABU on Instagram" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-gold hover:text-black transition text-gold"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+                    <a href="https://x.com/lifeshapekabu" target="_blank" rel="noopener" aria-label="LifeShape KABU on X" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-gold hover:text-black transition text-gold"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    <a href="https://youtube.com/@lifeshapekabu" target="_blank" rel="noopener" aria-label="LifeShape KABU on YouTube" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-gold hover:text-black transition text-gold"><i data-lucide="youtube" class="w-5 h-5"></i></a>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-bold mb-6 text-white">Quick Links</h4>
+                <ul class="space-y-4 text-gray-400">
+                    <li><button onclick="navigateTo('about')" class="hover:text-gold transition">About Us</button></li>
+                    <li><button onclick="navigateTo('events')" class="hover:text-gold transition">Upcoming Events</button></li>
+                    <li><button onclick="navigateTo('resources')" class="hover:text-gold transition">Growth Resources</button></li>
+                    <li><button onclick="navigateTo('contribution')" class="hover:text-gold transition">Contribution & Checkout</button></li>
+                    <li><button onclick="navigateTo('contact')" class="hover:text-gold transition">Contact Leadership</button></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-lg font-bold mb-6 text-white">Contact Info</h4>
+                <ul class="space-y-4 text-gray-400">
+                    <li class="flex items-start gap-3">
+                        <i data-lucide="map-pin" class="w-5 h-5 text-gold flex-shrink-0 mt-0.5"></i>
+                        <span>Kabarak University<br/>Nakuru, Kenya</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="mail" class="w-5 h-5 text-gold flex-shrink-0"></i>
+                        <a href="mailto:hello@lifeshapekabu.org" class="hover:text-gold transition">hello@lifeshapekabu.org</a>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="phone" class="w-5 h-5 text-gold flex-shrink-0"></i>
+                        <a href="tel:+254701279476" class="hover:text-gold transition">0701 279 476</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto mt-16 pt-8 border-t border-white/10 text-center text-gray-500 text-sm flex flex-col md:flex-row justify-between items-center">
+            <p>&copy; 2026 LifeShape Kabarak University Chapter. All rights reserved.</p>
+            <p class="mt-2 md:mt-0">Designed for Impact.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        const SITE_CONFIG = {
+            contactEmail: 'hello@lifeshapekabu.org',
+            registrationEndpoint: 'https://formsubmit.co/ajax/hello@lifeshapekabu.org',
+            whatsappNumber: '254701279476',
+            payments: {
+                currency: 'KES',
+                paypalReceiver: 'jaxmanro@gmail.com',
+                paypalCheckoutBase: 'https://www.paypal.com/cgi-bin/webscr',
+                cardCheckoutLink: 'https://paystack.shop/pay/lifeshape-give-once',
+                monthlyCardCheckoutLink: 'https://paystack.shop/pay/lifeshape-give-monthly'
+            },
+            captcha: {
+                minNumber: 2,
+                maxNumber: 11
+            }
+        };
+
+        // Page Content Data
+        const pages = {
+            home: `
+                <div class="page-content">
+                    <section class="min-h-[85vh] flex items-center justify-center px-6 relative hero-gradient overflow-hidden pt-10 pb-20">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
+                        <div class="relative z-10 text-center max-w-4xl mx-auto reveal active">
+                            <span class="text-gold font-bold tracking-[0.3em] uppercase text-sm mb-6 block animate-pulse">Kabarak University Chapter</span>
+                            <h1 class="text-5xl md:text-8xl font-bold mb-8 leading-tight">Shape Your Life <br/><span class="italic text-gold gold-glow">Through Christ</span></h1>
+                            <p class="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+                                A community of students pursuing purpose, radical growth, and kingdom-driven leadership. Your identity is waiting to be discovered.
+                            </p>
+                            <div class="flex flex-col sm:flex-row gap-5 justify-center">
+                                <button onclick="navigateTo('contact')" class="btn-gold px-10 py-4 rounded-full text-deep-navy font-bold text-lg">Join the Movement</button>
+                                <button onclick="navigateTo('about')" class="border border-gold text-gold hover:bg-gold hover:text-black px-10 py-4 rounded-full font-bold text-lg transition duration-300">Discover Purpose</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="py-24 px-6 max-w-7xl mx-auto">
+                        <div class="text-center mb-16 reveal">
+                            <h2 class="text-4xl md:text-5xl font-bold mb-6">What is LifeShape?</h2>
+                            <div class="w-24 h-1 bg-gold mx-auto mb-8 rounded-full"></div>
+                            <p class="text-gray-400 max-w-2xl mx-auto text-lg md:text-xl italic">
+                                "Do not be conformed to this world, but be transformed by the renewal of your mind..." — Romans 12:2
+                            </p>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <div class="card-hover p-8 rounded-2xl bg-white/5 reveal">
+                                <div class="text-gold mb-6 bg-gold/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                                    <i data-lucide="user-check" class="w-8 h-8"></i>
+                                </div>
+                                <h3 class="text-xl font-bold mb-4">Identity in Christ</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed">Moving from performance-based living to knowing who you are in Him.</p>
+                            </div>
+                            <div class="card-hover p-8 rounded-2xl bg-white/5 reveal">
+                                <div class="text-gold mb-6 bg-gold/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                                    <i data-lucide="trending-up" class="w-8 h-8"></i>
+                                </div>
+                                <h3 class="text-xl font-bold mb-4">Growth & Wisdom</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed">Engaging in deep spiritual disciplines and academic excellence.</p>
+                            </div>
+                            <div class="card-hover p-8 rounded-2xl bg-white/5 reveal">
+                                <div class="text-gold mb-6 bg-gold/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                                    <i data-lucide="users" class="w-8 h-8"></i>
+                                </div>
+                                <h3 class="text-xl font-bold mb-4">Accountability</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed">Doing life with friends who sharpen you and hold your vision high.</p>
+                            </div>
+                            <div class="card-hover p-8 rounded-2xl bg-white/5 reveal">
+                                <div class="text-gold mb-6 bg-gold/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                                    <i data-lucide="award" class="w-8 h-8"></i>
+                                </div>
+                                <h3 class="text-xl font-bold mb-4">Leadership</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed">Developing servant leaders ready to transform the marketplace.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-[#0a1128] py-24 px-6 border-y border-gold/5">
+                        <div class="max-w-7xl mx-auto text-center reveal">
+                            <h2 class="text-4xl md:text-5xl font-bold mb-16">Voices of Transformation</h2>
+                            <div class="grid md:grid-cols-3 gap-10">
+                                <div class="bg-white/5 p-10 rounded-3xl border-l-4 border-gold text-left relative overflow-hidden group hover:bg-white/10 transition">
+                                    <i data-lucide="quote" class="w-24 h-24 text-white/5 absolute -top-4 -right-4 group-hover:text-gold/10 transition"></i>
+                                    <p class="text-gray-300 italic relative z-10 text-lg leading-relaxed">
+                                        "LifeShape helped me find my voice at Kabarak. I realized that leadership starts with leading myself through Christ's principles."
+                                    </p>
+                                    <div class="mt-8 flex items-center gap-4 relative z-10">
+                                        <div class="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center text-gold font-bold">B</div>
+                                        <div>
+                                            <div class="font-bold text-white">Brian</div>
+                                            <div class="text-sm text-gold">4th Year, Computer Science</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white/5 p-10 rounded-3xl border-l-4 border-gold text-left relative overflow-hidden group hover:bg-white/10 transition">
+                                    <i data-lucide="quote" class="w-24 h-24 text-white/5 absolute -top-4 -right-4 group-hover:text-gold/10 transition"></i>
+                                    <p class="text-gray-300 italic relative z-10 text-lg leading-relaxed">
+                                        "The accountability groups are a game changer. I'm not just studying; I'm growing my spirit and my character every single day."
+                                    </p>
+                                    <div class="mt-8 flex items-center gap-4 relative z-10">
+                                        <div class="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center text-gold font-bold">S</div>
+                                        <div>
+                                            <div class="font-bold text-white">Sarah</div>
+                                            <div class="text-sm text-gold">2nd Year, Law</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white/5 p-10 rounded-3xl border-l-4 border-gold text-left relative overflow-hidden group hover:bg-white/10 transition">
+                                    <i data-lucide="quote" class="w-24 h-24 text-white/5 absolute -top-4 -right-4 group-hover:text-gold/10 transition"></i>
+                                    <p class="text-gray-300 italic relative z-10 text-lg leading-relaxed">
+                                        "I came looking for a club, but I found a family. LifeShape is where purpose meets real-world action."
+                                    </p>
+                                    <div class="mt-8 flex items-center gap-4 relative z-10">
+                                        <div class="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center text-gold font-bold">M</div>
+                                        <div>
+                                            <div class="font-bold text-white">Moses</div>
+                                            <div class="text-sm text-gold">3rd Year, Business</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="py-24 px-6 text-center reveal">
+                        <div class="max-w-4xl mx-auto bg-gradient-to-br from-[#d4af37] to-[#b8860b] p-12 md:p-16 rounded-[3rem] text-deep-navy shadow-2xl shadow-gold/20">
+                            <h2 class="text-4xl md:text-5xl font-bold mb-6">Ready to Start Your Journey?</h2>
+                            <p class="text-lg md:text-xl mb-10 opacity-90 font-medium max-w-2xl mx-auto">Every great story starts with a single step of faith. Join us this Tuesday at the School of Business Auditorium.</p>
+                            <button onclick="navigateTo('contact')" class="bg-deep-navy text-white px-10 py-4 rounded-full font-bold text-lg hover:-translate-y-1 hover:shadow-xl transition duration-300 flex items-center gap-3 mx-auto">
+                                <span>Sign Up Today</span>
+                                <i data-lucide="arrow-right" class="w-5 h-5 text-gold"></i>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            `,
+            about: `
+                <div class="page-content py-20 px-6">
+                    <div class="max-w-6xl mx-auto">
+                        <div class="text-center mb-20 reveal">
+                            <span class="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">Who We Are</span>
+                            <h1 class="text-5xl md:text-7xl font-bold mb-6">The <span class="text-gold italic">Heart</span> of LifeShape</h1>
+                            <p class="text-xl text-gray-400 max-w-2xl mx-auto">Discover the foundational truths and vision that drive our community at Kabarak University.</p>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-16 items-center mb-24 reveal">
+                            <div>
+                                <div class="inline-flex items-center gap-3 bg-gold/10 px-4 py-2 rounded-full mb-6 border border-gold/20">
+                                    <i data-lucide="eye" class="text-gold w-5 h-5"></i>
+                                    <span class="text-gold font-bold tracking-widest uppercase text-sm">Our Vision</span>
+                                </div>
+                                <h3 class="text-3xl md:text-4xl font-bold mb-6 leading-tight">Empowering a Generation</h3>
+                                <p class="text-gray-300 text-lg leading-relaxed">
+                                    To see a generation of Kabarak students transformed into Christ-centered leaders who influence every sphere of society with integrity, purpose, and excellence. We envision a campus where faith translates into tangible impact.
+                                </p>
+                            </div>
+                            <div class="bg-gradient-to-br from-white/10 to-transparent p-1 rounded-3xl">
+                                <div class="bg-[#0a1128] aspect-video rounded-3xl flex items-center justify-center border border-white/5 relative overflow-hidden group">
+                                    <div class="absolute inset-0 bg-gold/5 group-hover:bg-gold/10 transition"></div>
+                                    <i data-lucide="compass" class="text-gold/20 w-32 h-32 absolute -right-8 -bottom-8 transform rotate-12"></i>
+                                    <span class="text-gold text-2xl font-bold tracking-widest uppercase z-10 brand-font">Clarity of Purpose</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-16 items-center mb-32 reveal">
+                            <div class="order-2 md:order-1 bg-gradient-to-br from-gold/30 to-transparent p-1 rounded-3xl">
+                                <div class="bg-[#0a1128] aspect-video rounded-3xl flex items-center justify-center border border-white/5 relative overflow-hidden group">
+                                    <div class="absolute inset-0 bg-gold/5 group-hover:bg-gold/10 transition"></div>
+                                    <i data-lucide="target" class="text-gold/20 w-32 h-32 absolute -left-8 -bottom-8 transform -rotate-12"></i>
+                                    <span class="text-gold text-2xl font-bold tracking-widest uppercase z-10 brand-font">Intentional Action</span>
+                                </div>
+                            </div>
+                            <div class="order-1 md:order-2">
+                                <div class="inline-flex items-center gap-3 bg-gold/10 px-4 py-2 rounded-full mb-6 border border-gold/20">
+                                    <i data-lucide="flag" class="text-gold w-5 h-5"></i>
+                                    <span class="text-gold font-bold tracking-widest uppercase text-sm">Our Mission</span>
+                                </div>
+                                <h3 class="text-3xl md:text-4xl font-bold mb-6 leading-tight">Building the Foundation</h3>
+                                <p class="text-gray-300 text-lg leading-relaxed">
+                                    We build intentional environments for discipleship, mentorship, and leadership development, grounding every student in their true identity in Christ through authentic relationships and biblical application.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mb-32 reveal bg-white/5 rounded-[3rem] p-10 md:p-16 border border-white/5">
+                            <h2 class="text-3xl md:text-5xl font-bold mb-16 text-center">Core Pillars</h2>
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <div class="group p-8 rounded-2xl bg-[#050A18] border border-gold/10 hover:border-gold/40 transition">
+                                    <div class="w-14 h-14 bg-gold/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-gold group-hover:text-black transition text-gold">
+                                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold mb-3 text-white">Faith First</h4>
+                                    <p class="text-gray-400 leading-relaxed">Everything we do stems from our relationship with God and Biblical truth. It is the anchor of our identity.</p>
+                                </div>
+                                <div class="group p-8 rounded-2xl bg-[#050A18] border border-gold/10 hover:border-gold/40 transition">
+                                    <div class="w-14 h-14 bg-gold/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-gold group-hover:text-black transition text-gold">
+                                        <i data-lucide="sprout" class="w-6 h-6"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold mb-3 text-white">Intentional Growth</h4>
+                                    <p class="text-gray-400 leading-relaxed">We don't grow by accident. We grow by choice, discipline, and consistently applying wisdom to our lives.</p>
+                                </div>
+                                <div class="group p-8 rounded-2xl bg-[#050A18] border border-gold/10 hover:border-gold/40 transition">
+                                    <div class="w-14 h-14 bg-gold/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-gold group-hover:text-black transition text-gold">
+                                        <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold mb-3 text-white">Authentic Community</h4>
+                                    <p class="text-gray-400 leading-relaxed">Vulnerability and accountability are the bedrock of our friendships. We walk together through highs and lows.</p>
+                                </div>
+                                <div class="group p-8 rounded-2xl bg-[#050A18] border border-gold/10 hover:border-gold/40 transition">
+                                    <div class="w-14 h-14 bg-gold/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-gold group-hover:text-black transition text-gold">
+                                        <i data-lucide="crown" class="w-6 h-6"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold mb-3 text-white">Servant Leadership</h4>
+                                    <p class="text-gray-400 leading-relaxed">We lead to serve others, not to be served. True influence is measured by how well we uplift those around us.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reveal text-center">
+                            <h2 class="text-3xl md:text-5xl font-bold mb-6">Student Leadership</h2>
+                            <p class="text-gray-400 mb-16 max-w-2xl mx-auto">Meet the dedicated team guiding the LifeShape movement at Kabarak University this academic year.</p>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+                                <div class="group">
+                                    <div class="w-40 h-40 bg-gradient-to-br from-gold/20 to-transparent rounded-full mx-auto mb-6 p-1 relative">
+                                        <div class="w-full h-full bg-[#0a1128] rounded-full flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-gold transition duration-300">
+                                            <i data-lucide="user" class="w-16 h-16 text-gray-600 group-hover:text-gold transition duration-300"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="text-xl font-bold mb-1">Blessing Maluu</h5>
+                                    <p class="text-sm text-gold uppercase tracking-widest font-semibold">Chairperson</p>
+                                </div>
+                                <div class="group">
+                                    <div class="w-40 h-40 bg-gradient-to-br from-gold/20 to-transparent rounded-full mx-auto mb-6 p-1 relative">
+                                        <div class="w-full h-full bg-[#0a1128] rounded-full flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-gold transition duration-300">
+                                            <i data-lucide="user" class="w-16 h-16 text-gray-600 group-hover:text-gold transition duration-300"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="text-xl font-bold mb-1">Eustace Munene</h5>
+                                    <p class="text-sm text-gold uppercase tracking-widest font-semibold">Vice Chairperson</p>
+                                </div>
+                                <div class="group">
+                                    <div class="w-40 h-40 bg-gradient-to-br from-gold/20 to-transparent rounded-full mx-auto mb-6 p-1 relative">
+                                        <div class="w-full h-full bg-[#0a1128] rounded-full flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-gold transition duration-300">
+                                            <i data-lucide="user" class="w-16 h-16 text-gray-600 group-hover:text-gold transition duration-300"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="text-xl font-bold mb-1">Ian Gichuki O.</h5>
+                                    <p class="text-sm text-gold uppercase tracking-widest font-semibold">Discipleship Lead</p>
+                                </div>
+                                <div class="group">
+                                    <div class="w-40 h-40 bg-gradient-to-br from-gold/20 to-transparent rounded-full mx-auto mb-6 p-1 relative">
+                                        <div class="w-full h-full bg-[#0a1128] rounded-full flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-gold transition duration-300">
+                                            <i data-lucide="user" class="w-16 h-16 text-gray-600 group-hover:text-gold transition duration-300"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="text-xl font-bold mb-1">Esther Nyokabi.</h5>
+                                    <p class="text-sm text-gold uppercase tracking-widest font-semibold">Events Coordinator</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            events: `
+                <div class="page-content py-20 px-6 max-w-7xl mx-auto">
+                    <div class="text-center mb-20 reveal">
+                        <span class="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">Our Calendar</span>
+                        <h1 class="text-5xl md:text-7xl font-bold mb-6">Connect <span class="text-gold italic">& Grow</span></h1>
+                        <p class="text-xl text-gray-400 max-w-2xl mx-auto">Join us for weekly fellowships, profound workshops, and transformational retreats.</p>
+                    </div>
+
+                    <div class="grid lg:grid-cols-3 gap-12">
+                        <!-- Main Events Column -->
+                        <div class="lg:col-span-2 space-y-12">
+                            <div class="reveal">
+                                <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-3 border-b border-white/10 pb-4">
+                                    <i data-lucide="calendar" class="text-gold"></i> Weekly Gatherings
+                                </h2>
+                                <div class="bg-gradient-to-br from-white/5 to-transparent rounded-3xl p-8 border border-gold/20 card-hover relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full blur-3xl"></div>
+                                    <div class="flex flex-col md:flex-row gap-8 relative z-10">
+                                        <div class="md:w-1/4 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-start border-b md:border-b-0 md:border-r border-white/10 pb-4 md:pb-0 md:pr-4">
+                                            <div>
+                                                <div class="text-4xl font-black text-gold mb-1">TUE</div>
+                                                <div class="text-gray-400 font-medium tracking-wider">WEEKLY</div>
+                                            </div>
+                                            <div class="text-right md:text-left md:mt-4">
+                                                <div class="text-white font-bold flex items-center gap-2 justify-end md:justify-start">
+                                                    <i data-lucide="clock" class="w-4 h-4 text-gold"></i> 17:30
+                                                </div>
+                                                <div class="text-sm text-gray-400">SOB Auditorium</div>
+                                            </div>
+                                        </div>
+                                        <div class="md:w-3/4">
+                                            <h3 class="text-2xl font-bold mb-3 text-white">LifeShape Encounter</h3>
+                                            <p class="text-gray-400 mb-6 leading-relaxed">Our main weekly fellowship focusing on discovering identity, leadership talks, deep worship, and breaking down biblical truths into practical lifestyle choices.</p>
+                                            <div class="flex flex-wrap gap-3">
+                                                <span class="bg-gold/10 text-gold px-4 py-1.5 rounded-full text-xs font-bold tracking-widest border border-gold/20">ALL WELCOME</span>
+                                                <span class="bg-white/5 text-gray-300 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest border border-white/10">WORSHIP & WORD</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="reveal">
+                                <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-3 border-b border-white/10 pb-4">
+                                    <i data-lucide="star" class="text-gold"></i> Upcoming Special Events
+                                </h2>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <!-- Event 1 -->
+                                    <div class="bg-[#0a1128] rounded-2xl p-6 border border-white/5 hover:border-gold/30 transition group flex flex-col h-full">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <div class="bg-gold/10 text-gold px-3 py-1 rounded-md text-xs font-bold tracking-wider">WORKSHOP</div>
+                                            <div class="text-gray-400 text-sm font-medium"><i data-lucide="calendar-days" class="inline w-4 h-4 mr-1"></i> March 15</div>
+                                        </div>
+                                        <h4 class="text-xl font-bold mb-3 group-hover:text-gold transition">Purpose Discovery Workshop</h4>
+                                        <p class="text-gray-400 text-sm leading-relaxed mb-6 flex-grow">A deep-dive interactive session designed to help you map your natural skills and spiritual gifts to your specific life calling.</p>
+                                        <button class="text-gold text-sm font-bold flex items-center gap-1 group-hover:translate-x-2 transition">
+                                            Register Now <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Event 2 -->
+                                    <div class="bg-[#0a1128] rounded-2xl p-6 border border-white/5 hover:border-gold/30 transition group flex flex-col h-full">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <div class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-md text-xs font-bold tracking-wider">RETREAT</div>
+                                            <div class="text-gray-400 text-sm font-medium"><i data-lucide="calendar-days" class="inline w-4 h-4 mr-1"></i> April 10-12</div>
+                                        </div>
+                                        <h4 class="text-xl font-bold mb-3 group-hover:text-gold transition">Annual Leadership Retreat</h4>
+                                        <p class="text-gray-400 text-sm leading-relaxed mb-6 flex-grow">Three days of intense training, prayer, and bonding away from campus. Reconnect with God and build lasting friendships.</p>
+                                        <button class="text-gold text-sm font-bold flex items-center gap-1 group-hover:translate-x-2 transition">
+                                            View Details <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Event 3 -->
+                                    <div class="bg-[#0a1128] rounded-2xl p-6 border border-white/5 hover:border-gold/30 transition group flex flex-col h-full md:col-span-2">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <div class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-md text-xs font-bold tracking-wider">OUTREACH</div>
+                                            <div class="text-gray-400 text-sm font-medium"><i data-lucide="calendar-days" class="inline w-4 h-4 mr-1"></i> May 5</div>
+                                        </div>
+                                        <h4 class="text-xl font-bold mb-3 group-hover:text-gold transition">Community Impact Day</h4>
+                                        <p class="text-gray-400 text-sm leading-relaxed mb-6 flex-grow">Taking our faith outside the campus walls. We will be partnering with local high schools in Nakuru for mentorship and donations.</p>
+                                        <button class="text-gold text-sm font-bold flex items-center gap-1 group-hover:translate-x-2 transition">
+                                            Volunteer <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar Column -->
+                        <div class="lg:col-span-1 space-y-8">
+                            <div class="bg-white/5 rounded-3xl p-8 border border-white/10 reveal">
+                                <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                                    <i data-lucide="bell" class="text-gold w-5 h-5"></i> Stay Updated
+                                </h3>
+                                <p class="text-gray-400 text-sm mb-6">Don't miss out on any impromptu meetups or venue changes. Join our official WhatsApp community platform.</p>
+                                <a href="https://wa.me/254701279476" target="_blank" rel="noopener" class="block w-full text-center bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/30 py-3 rounded-xl font-bold hover:bg-[#25D366] hover:text-black transition flex items-center justify-center gap-2">
+                                    <i data-lucide="message-circle" class="w-5 h-5"></i> Join WhatsApp Group
+                                </a>
+                            </div>
+
+                            <div class="bg-gradient-to-b from-gold/10 to-transparent rounded-3xl p-8 border border-gold/20 reveal">
+                                <div class="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center text-gold mb-6">
+                                    <i data-lucide="map" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="text-xl font-bold mb-4">Need Directions?</h3>
+                                <p class="text-gray-300 text-sm mb-4">The School of Business (SOB) Auditorium is located at the main campus, past the library building.</p>
+                                <button onclick="navigateTo('contact')" class="text-gold text-sm font-bold border-b border-gold pb-1 hover:text-white hover:border-white transition">Contact us for help</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            resources: `
+                <div class="page-content py-20 px-6 max-w-5xl mx-auto">
+                    <div class="text-center mb-16 reveal">
+                        <span class="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">Knowledge Base</span>
+                        <h1 class="text-5xl md:text-7xl font-bold mb-6">Growth <span class="text-gold italic">Library</span></h1>
+                        <p class="text-xl text-gray-400 max-w-2xl mx-auto">Access our curated collection of teachings, mentorship guides, and study materials designed to accelerate your spiritual and personal growth.</p>
+                    </div>
+
+                    <!-- Search and Filter (Visual Only) -->
+                    <div class="bg-white/5 p-4 rounded-2xl mb-12 flex flex-col sm:flex-row gap-4 reveal">
+                        <div class="relative flex-grow">
+                            <i data-lucide="search" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5"></i>
+                            <input type="text" placeholder="Search resources..." class="w-full bg-[#0a1128] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-gold transition">
+                        </div>
+                        <button class="bg-[#0a1128] border border-white/10 px-6 py-3 rounded-xl text-gray-300 hover:text-gold hover:border-gold transition flex items-center justify-center gap-2 whitespace-nowrap">
+                            <i data-lucide="filter" class="w-4 h-4"></i> Filter
+                        </button>
+                    </div>
+
+                    <div class="bg-[#050A18] border border-gold/10 rounded-3xl overflow-hidden shadow-2xl reveal">
+                        <div class="grid grid-cols-12 gap-4 p-6 border-b border-white/5 bg-white/5 text-xs font-bold tracking-widest text-gray-400 uppercase hidden md:grid">
+                            <div class="col-span-8">Document Title</div>
+                            <div class="col-span-4 text-right">Actions</div>
+                        </div>
+
+                        <div class="divide-y divide-white/5">
+                            <!-- Resource Item 1 -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-6 hover:bg-white/5 transition group items-center">
+                                <div class="md:col-span-8 flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center text-red-400 flex-shrink-0">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-white group-hover:text-gold transition text-lg">Understanding Identity in Christ</div>
+                                        <div class="text-sm text-gray-500 mt-1">Foundations Module 1 • PDF Document</div>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-4 flex gap-3 md:justify-end mt-4 md:mt-0">
+                                    <a href="https://drive.google.com/file/d/1g2ZqSRxDxQh3A3dz5oohk4RB3HA49rEN/view?usp=drive_link" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-white/5 hover:bg-gold/10 text-gold border border-gold/20 px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                                        <i data-lucide="eye" class="w-4 h-4"></i> View
+                                    </a>
+                                    <a href="https://drive.google.com/uc?export=download&id=1g2ZqSRxDxQh3A3dz5oohk4RB3HA49rEN" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-gold text-deep-navy hover:bg-white px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                                        <i data-lucide="download" class="w-4 h-4"></i> Get
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Resource Item 2 -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-6 hover:bg-white/5 transition group items-center">
+                                <div class="md:col-span-8 flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 flex-shrink-0">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-white group-hover:text-gold transition text-lg">The Discipline of Grace</div>
+                                        <div class="text-sm text-gray-500 mt-1">Growth Series • Study Guide</div>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-4 flex gap-3 md:justify-end mt-4 md:mt-0">
+                                    <a href="https://drive.google.com/file/d/1_UmtlUCa03wvzaYKITJqzciCOkdq4neO/view?usp=drive_link" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-white/5 hover:bg-gold/10 text-gold border border-gold/20 px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                                        <i data-lucide="eye" class="w-4 h-4"></i> View
+                                    </a>
+                                    <a href="https://drive.google.com/uc?export=download&id=1_UmtlUCa03wvzaYKITJqzciCOkdq4neO" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-gold text-deep-navy hover:bg-white px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                                        <i data-lucide="download" class="w-4 h-4"></i> Get
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Resource Item 3 -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-6 hover:bg-white/5 transition group items-center">
+                                <div class="md:col-span-8 flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center text-green-400 flex-shrink-0">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-white group-hover:text-gold transition text-lg">Servant Leadership Model</div>
+                                        <div class="text-sm text-gray-500 mt-1">Leadership Track • Framework</div>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-4 flex gap-3 md:justify-end mt-4 md:mt-0">
+                                    <a href="https://drive.google.com/file/d/1OtbW5PYWePTkCWAA0MjpE3hmzxLzDzPT/view?usp=drive_link" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-white/5 hover:bg-gold/10 text-gold border border-gold/20 px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                                        <i data-lucide="eye" class="w-4 h-4"></i> View
+                                    </a>
+                                    <a href="https://drive.google.com/uc?export=download&id=1OtbW5PYWePTkCWAA0MjpE3hmzxLzDzPT" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-gold text-deep-navy hover:bg-white px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                                        <i data-lucide="download" class="w-4 h-4"></i> Get
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Resource Item 4 -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-6 hover:bg-white/5 transition group items-center">
+                                <div class="md:col-span-8 flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-400 flex-shrink-0">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-white group-hover:text-gold transition text-lg">Accountability Group Questions</div>
+                                        <div class="text-sm text-gray-500 mt-1">Community • Discussion Guide</div>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-4 flex gap-3 md:justify-end mt-4 md:mt-0">
+                                    <a href="https://drive.google.com/file/d/138RssZMw9Foo0XLjgLmo1IRCrbDB2mPD/view?usp=drive_link" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-white/5 hover:bg-gold/10 text-gold border border-gold/20 px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                                        <i data-lucide="eye" class="w-4 h-4"></i> View
+                                    </a>
+                                    <a href="https://drive.google.com/uc?export=download&id=138RssZMw9Foo0XLjgLmo1IRCrbDB2mPD" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-gold text-deep-navy hover:bg-white px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                                        <i data-lucide="download" class="w-4 h-4"></i> Get
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Remaining Items collapsed structurally for brevity but complete functionality -->
+                            ${[
+                                {id: '1tDCRfP1PFD3fYGEKlU5oygyv62bGSro5', title: 'Navigating Academic Excellence', type: 'Excellence • Guide', icon: 'book', color: 'yellow'},
+                                {id: '1cNJi9qIdM_I-kk7JHWxZ18uqJLE358DI', title: 'Prayer Walking Campus Maps', type: 'Spiritual Warfare • Map', icon: 'map', color: 'indigo'},
+                                {id: '1diTLZCGUUPsf8ol3jRvtWvYZwyxIM_Pc', title: 'Marketplace Ministry Notes', type: 'Career • Session Notes', icon: 'briefcase', color: 'orange'},
+                                {id: '19t3n7fsDiEbw164gHW0o3DiFb9Ct8yKT', title: 'LifeShape Core Values Full Text', type: 'Foundation • Handbook', icon: 'bookmark', color: 'pink'},
+                                {id: '1ZmZdHmcLogzi1V949KbSOaCK-TfFrzuF', title: 'Mentorship Request Form', type: 'Admin • Form', icon: 'clipboard', color: 'gray'}
+                            ].map(item => `
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-6 hover:bg-white/5 transition group items-center">
+                                    <div class="md:col-span-8 flex items-center gap-4">
+                                        <div class="w-10 h-10 bg-${item.color}-500/10 rounded-lg flex items-center justify-center text-${item.color}-400 flex-shrink-0">
+                                            <i data-lucide="${item.icon}" class="w-5 h-5"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-white group-hover:text-gold transition text-lg">${item.title}</div>
+                                            <div class="text-sm text-gray-500 mt-1">${item.type}</div>
+                                        </div>
+                                    </div>
+                                    <div class="md:col-span-4 flex gap-3 md:justify-end mt-4 md:mt-0">
+                                        <a href="https://drive.google.com/file/d/${item.id}/view?usp=drive_link" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-white/5 hover:bg-gold/10 text-gold border border-gold/20 px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                                            <i data-lucide="eye" class="w-4 h-4"></i> View
+                                        </a>
+                                        <a href="https://drive.google.com/uc?export=download&id=${item.id}" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-gold text-deep-navy hover:bg-white px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                                            <i data-lucide="download" class="w-4 h-4"></i> Get
+                                        </a>
+                                    </div>
+                                </div>
+                            `).join('')}
+
+                        </div>
+                    </div>
+                </div>
+            `,
+            contribution: `
+                <div class="page-content py-20 px-6 max-w-7xl mx-auto">
+                    <div class="text-center mb-16 reveal">
+                        <span class="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">Contribution Hub</span>
+                        <h1 class="text-5xl md:text-7xl font-bold mb-6">Give with <span class="text-gold italic">Purpose</span></h1>
+                        <p class="text-xl text-gray-400 max-w-3xl mx-auto">Build impact through a transparent contribution cart. Fund discipleship activities, club operations, and software maintenance in one secure checkout flow.</p>
+                    </div>
+
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <section class="lg:col-span-2 space-y-6">
+                            <div class="bg-white/5 border border-white/10 rounded-3xl p-8 reveal">
+                                <h3 class="text-2xl font-bold mb-3">Where your contribution goes</h3>
+                                <p class="text-gray-400 mb-6">Choose one or more causes and set quantity (each unit equals the amount shown).</p>
+                                <div class="space-y-4" id="contribution-catalog">
+                                    ${[
+                                        { id: 'discipleship', title: 'Discipleship Activities', amount: 500, desc: 'Weekly fellowship logistics, worship support, mentorship circles, and Bible study materials.' },
+                                        { id: 'community-impact', title: 'Community Outreach', amount: 1000, desc: 'School outreach transport, impact-day resources, and service project supplies.' },
+                                        { id: 'club-operations', title: 'Club Activities & Maintenance', amount: 1500, desc: 'Venue setup, sound needs, leadership training, and student activity coordination.' },
+                                        { id: 'software', title: 'Software & Platform Maintenance', amount: 2500, desc: 'Website hosting, domain renewals, security updates, forms, and digital communications.' }
+                                    ].map(item => `
+                                    <article class="border border-white/10 rounded-2xl p-5 bg-[#0a1128]">
+                                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                                            <div>
+                                                <h4 class="text-lg font-bold text-white">${item.title}</h4>
+                                                <p class="text-gray-400 text-sm mt-1">${item.desc}</p>
+                                                <p class="text-gold font-bold mt-3">KES ${item.amount.toLocaleString()} per unit</p>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <button class="qty-btn border border-white/20 rounded-lg px-3 py-1 text-lg" data-target="${item.id}" data-change="-1" type="button">−</button>
+                                                <span id="qty-${item.id}" class="w-10 text-center font-bold">0</span>
+                                                <button class="qty-btn border border-white/20 rounded-lg px-3 py-1 text-lg" data-target="${item.id}" data-change="1" type="button">+</button>
+                                            </div>
+                                        </div>
+                                    </article>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </section>
+
+                        <aside class="space-y-6">
+                            <div class="bg-[#050A18] border border-gold/20 p-6 rounded-3xl reveal sticky top-24">
+                                <h3 class="text-2xl font-bold mb-4">Checkout</h3>
+                                <div id="cart-items" class="space-y-3 text-sm text-gray-300 mb-4">
+                                    <p class="text-gray-500">Your cart is empty. Add causes to proceed.</p>
+                                </div>
+                                <div class="border-t border-white/10 pt-4 mb-4">
+                                    <div class="flex items-center justify-between text-lg font-bold">
+                                        <span>Total</span>
+                                        <span id="cart-total" class="text-gold">KES 0</span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <a id="paypal-checkout-link" target="_blank" rel="noopener" href="#" class="w-full btn-gold text-deep-navy font-bold py-3 rounded-xl flex items-center justify-center gap-2">
+                                        <i data-lucide="wallet" class="w-5 h-5"></i> Checkout with PayPal
+                                    </a>
+                                    <a id="card-checkout-link" target="_blank" rel="noopener" href="https://paystack.shop/pay/lifeshape-give-once" class="w-full border border-gold/40 text-gold font-bold py-3 rounded-xl hover:bg-gold/10 transition flex items-center justify-center gap-2">
+                                        <i data-lucide="credit-card" class="w-5 h-5"></i> Card / M-Pesa (Paystack)
+                                    </a>
+                                    <a id="monthly-card-checkout-link" target="_blank" rel="noopener" href="https://paystack.shop/pay/lifeshape-give-monthly" class="w-full border border-white/20 text-white font-bold py-3 rounded-xl hover:border-gold hover:text-gold transition flex items-center justify-center gap-2">
+                                        <i data-lucide="repeat" class="w-5 h-5"></i> Monthly Partner (Card)
+                                    </a>
+                                </div>
+
+                                <div class="mt-5 text-xs text-gray-500 space-y-2">
+                                    <p>PayPal receiver: <span class="text-gold">jaxmanro@gmail.com</span></p>
+                                    <p>Card options are available via PayPal guest checkout and Paystack secure pages.</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-[#050A18] border border-white/10 p-6 rounded-3xl reveal">
+                                <h4 class="text-xl font-bold mb-3">Money Order Details</h4>
+                                <p class="text-sm text-gray-400 mb-4">Create an order summary for finance records before checkout.</p>
+                                <form id="money-order-form" class="space-y-3">
+                                    <input id="order-name" type="text" required class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Full name">
+                                    <input id="order-email" type="email" required class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Email address">
+                                    <input id="order-phone" type="tel" required class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Phone / WhatsApp">
+                                    <select id="order-payment-method" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition">
+                                        <option value="paypal">PayPal</option>
+                                        <option value="card">Card / M-Pesa (Paystack)</option>
+                                        <option value="monthly">Monthly Partner (Card)</option>
+                                    </select>
+                                    <textarea id="order-notes" rows="2" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Notes (optional)"></textarea>
+                                    <p id="money-order-line-items" class="text-xs text-gray-400">Order items: none selected yet.</p>
+
+                                    <div class="p-3 rounded-lg bg-white/5 border border-white/10">
+                                        <label class="flex items-center gap-2 text-sm text-white mb-2 cursor-pointer">
+                                            <input id="order-not-robot" type="checkbox" class="w-4 h-4 accent-[#D4AF37]">
+                                            <span>I'm not a robot</span>
+                                        </label>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            <p id="order-captcha-question" class="text-xs text-gray-400"></p>
+                                            <input id="order-captcha-answer" type="number" class="w-full bg-[#0a1128] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Captcha answer">
+                                        </div>
+                                    </div>
+
+                                    <p id="money-order-status" class="hidden text-xs rounded-lg px-3 py-2 border"></p>
+                                    <button id="money-order-submit" type="submit" class="w-full btn-gold text-deep-navy font-bold py-3 rounded-xl">Place Money Order</button>
+                                </form>
+                                <div id="money-order-links" class="hidden mt-3 space-y-2 text-sm">
+                                    <a id="money-order-email-link" href="#" class="text-gold hover:underline block">Send order by email</a>
+                                    <a id="money-order-whatsapp-link" href="#" target="_blank" rel="noopener" class="text-gold hover:underline block">Send order by WhatsApp</a>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            `
+,
+            contact: `
+                <div class="page-content py-20 px-6 max-w-5xl mx-auto">
+                    <div class="text-center mb-16 reveal">
+                        <span class="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">Take The Step</span>
+                        <h1 class="text-5xl md:text-7xl font-bold mb-6">Join the <span class="text-gold italic">Movement</span></h1>
+                        <p class="text-xl text-gray-400 max-w-2xl mx-auto">Whether you're curious, ready to commit, or looking to serve, there's a place for you here.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-5 gap-12 reveal">
+                        <div class="md:col-span-2 space-y-8">
+                            <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
+                                <h3 class="text-xl font-bold mb-6 text-white border-b border-white/10 pb-4">Direct Contact</h3>
+                                <ul class="space-y-6">
+                                    <li class="flex items-start gap-4">
+                                        <div class="w-10 h-10 bg-gold/10 rounded-full flex items-center justify-center text-gold flex-shrink-0">
+                                            <i data-lucide="map-pin" class="w-5 h-5"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-white mb-1">Location</div>
+                                            <div class="text-gray-400 text-sm">School of Business (SOB) Auditorium, Kabarak University</div>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start gap-4">
+                                        <div class="w-10 h-10 bg-gold/10 rounded-full flex items-center justify-center text-gold flex-shrink-0">
+                                            <i data-lucide="clock" class="w-5 h-5"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-white mb-1">Meeting Time</div>
+                                            <div class="text-gray-400 text-sm">Every Tuesday <br/> 17:30 - 19:30</div>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start gap-4">
+                                        <div class="w-10 h-10 bg-gold/10 rounded-full flex items-center justify-center text-gold flex-shrink-0">
+                                            <i data-lucide="phone" class="w-5 h-5"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-white mb-1">Call Us</div>
+                                            <div class="text-gray-400 text-sm"><a href="tel:+254701279476" class="hover:text-gold transition">0701 279 476</a> <br/> <a href="https://wa.me/254701279476" target="_blank" rel="noopener" class="hover:text-gold transition">WhatsApp Chat</a></div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-3 space-y-8">
+                            <form id="registration-form" class="bg-[#050A18] border border-gold/20 p-8 md:p-10 rounded-3xl shadow-2xl">
+                                <h3 class="text-2xl font-bold mb-8 text-white">Registration Form</h3>
+                                
+                                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-400 mb-2">First Name</label>
+                                        <input type="text" name="firstName" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition" placeholder="John">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-400 mb-2">Last Name</label>
+                                        <input type="text" name="lastName" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition" placeholder="Doe">
+                                    </div>
+                                </div>
+
+                                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-400 mb-2">Email Address</label>
+                                        <input type="email" name="email" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition" placeholder="john@student.kabarak.ac.ke">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-400 mb-2">Phone / WhatsApp</label>
+                                        <input type="tel" name="phone" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition" placeholder="07...">
+                                    </div>
+                                </div>
+
+                                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-400 mb-2">Year of Study</label>
+                                        <select name="yearOfStudy" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition appearance-none">
+                                            <option value="1">1st Year</option>
+                                            <option value="2">2nd Year</option>
+                                            <option value="3">3rd Year</option>
+                                            <option value="4">4th Year</option>
+                                            <option value="postgrad">Postgraduate</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-400 mb-2">Course / Faculty</label>
+                                        <input type="text" name="course" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition" placeholder="e.g. Computer Science">
+                                    </div>
+                                </div>
+
+                                <div class="mb-8">
+                                    <label class="block text-sm font-bold text-gray-400 mb-2">What are you looking for? (Optional)</label>
+                                    <textarea name="interest" rows="3" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold transition resize-none" placeholder="E.g., I want to grow in my faith, find an accountability group..."></textarea>
+                                </div>
+
+                                <div class="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
+                                    <p class="text-sm font-bold text-gray-300 mb-3">CAPTCHA Verification</p>
+                                    <label class="flex items-center gap-2 text-sm text-white mb-3 cursor-pointer">
+                                        <input id="join-not-robot" type="checkbox" class="w-4 h-4 accent-[#D4AF37]">
+                                        <span>I'm not a robot</span>
+                                    </label>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <p id="join-captcha-question" class="text-xs text-gray-400"></p>
+                                        <input id="join-captcha-answer" type="number" class="w-full bg-[#0a1128] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-gold transition" placeholder="Captcha answer">
+                                    </div>
+                                </div>
+
+                                <p id="form-status" class="hidden mb-6 text-sm rounded-lg px-4 py-3 border"></p>
+                                <button id="submit-btn" type="submit" class="w-full btn-gold text-deep-navy font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-2">
+                                    <span id="submit-label">Submit Details</span>
+                                    <i data-lucide="send" class="w-5 h-5"></i>
+                                </button>
+                            </form>
+
+                            <section class="bg-[#050A18] border border-gold/20 p-8 md:p-10 rounded-3xl shadow-2xl">
+                                <h3 class="text-2xl font-bold text-white mb-3">Support the Movement</h3>
+                                <p class="text-gray-400 mb-6">Use the full contribution cart and checkout flow for one-time gifts, projects, and monthly partnership.</p>
+                                <button onclick="navigateTo('contribution')" class="w-full btn-gold text-deep-navy font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-2" type="button">
+                                    <span>Open Contribution Checkout</span>
+                                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                                </button>
+                                <p class="text-xs text-gray-500 mt-4">Need help with giving? <a href="https://wa.me/254701279476" target="_blank" rel="noopener" class="text-gold hover:underline">Chat on WhatsApp</a>.</p>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        // Navigation Logic
+        function navigateTo(pageId) {
+            const content = pages[pageId];
+            if (!content) return;
+
+            const appContent = document.getElementById('app-content');
+            
+            // Fade out
+            appContent.style.opacity = '0';
+            
+            setTimeout(() => {
+                appContent.innerHTML = content;
+                window.scrollTo(0, 0);
+                
+                // Fade in
+                appContent.style.opacity = '1';
+                
+                // Update active nav state
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                const activeLink = document.getElementById(`nav-${pageId}`);
+                if (activeLink) activeLink.classList.add('active');
+
+                // Re-initialize Lucide Icons for newly injected HTML
+                lucide.createIcons();
+
+                // Re-initialize scroll reveal animations
+                initReveal();
+
+                // Re-bind contact form when contact page is rendered
+                initRegistrationForm();
+                initContributionCart();
+            }, 200); // match roughly with a short fade duration
+        }
+
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('open');
+            document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+        }
+
+        // Scroll Reveal Animation
+        function initReveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            const revealOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, revealOptions);
+
+            reveals.forEach(reveal => {
+                revealOnScroll.observe(reveal);
+            });
+            
+            // Trigger immediately for elements already in viewport
+            setTimeout(() => {
+                reveals.forEach(reveal => {
+                    const rect = reveal.getBoundingClientRect();
+                    if(rect.top < window.innerHeight) {
+                        reveal.classList.add('active');
+                    }
+                });
+            }, 100);
+        }
+
+        function initRegistrationForm() {
+            const form = document.getElementById('registration-form');
+            if (!form) return;
+
+            const submitBtn = document.getElementById('submit-btn');
+            const submitLabel = document.getElementById('submit-label');
+            const statusBox = document.getElementById('form-status');
+            const notRobot = document.getElementById('join-not-robot');
+            const captchaQuestion = document.getElementById('join-captcha-question');
+            const captchaAnswer = document.getElementById('join-captcha-answer');
+            let expectedCaptchaAnswer = null;
+
+            const setupCaptcha = () => {
+                const min = SITE_CONFIG.captcha.minNumber;
+                const max = SITE_CONFIG.captcha.maxNumber;
+                const a = Math.floor(Math.random() * (max - min + 1)) + min;
+                const b = Math.floor(Math.random() * (max - min + 1)) + min;
+                expectedCaptchaAnswer = a + b;
+                if (captchaQuestion) captchaQuestion.textContent = `Solve: ${a} + ${b}`;
+                if (captchaAnswer) captchaAnswer.value = '';
+                if (notRobot) notRobot.checked = false;
+            };
+            setupCaptcha();
+
+            const showStatus = (message, isSuccess = true) => {
+                statusBox.classList.remove('hidden', 'border-red-400/40', 'text-red-300', 'bg-red-900/20', 'border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                if (isSuccess) {
+                    statusBox.classList.add('border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                } else {
+                    statusBox.classList.add('border-red-400/40', 'text-red-300', 'bg-red-900/20');
+                }
+                statusBox.textContent = message;
+            };
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const humanConfirmed = Boolean(notRobot?.checked);
+                const answerIsValid = Number(captchaAnswer?.value) === expectedCaptchaAnswer;
+                if (!humanConfirmed || !answerIsValid) {
+                    showStatus('Please complete CAPTCHA verification correctly before submitting.', false);
+                    setupCaptcha();
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+                submitLabel.textContent = 'Submitting...';
+
+                const formData = new FormData(form);
+                formData.append('_subject', 'New LifeShape Registration');
+                formData.append('_template', 'table');
+
+                try {
+                    const response = await fetch(SITE_CONFIG.registrationEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Submission failed');
+                    }
+
+                    form.reset();
+                    showStatus('Thanks for registering! We have received your details and will contact you soon on WhatsApp or phone.');
+                } catch (error) {
+                    showStatus('We could not submit your form right now. Please retry or contact us directly on WhatsApp: +254 701 279 476.', false);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                    submitLabel.textContent = 'Submit Details';
+                    setupCaptcha();
+                }
+            });
+        }
+
+        function initContributionCart() {
+            const cartContainer = document.getElementById('cart-items');
+            if (!cartContainer) return;
+
+            const catalog = {
+                'discipleship': { title: 'Discipleship Activities', amount: 500 },
+                'community-impact': { title: 'Community Outreach', amount: 1000 },
+                'club-operations': { title: 'Club Activities & Maintenance', amount: 1500 },
+                'software': { title: 'Software & Platform Maintenance', amount: 2500 }
+            };
+
+            const quantities = Object.fromEntries(Object.keys(catalog).map(key => [key, 0]));
+            const totalLabel = document.getElementById('cart-total');
+            const paypalLink = document.getElementById('paypal-checkout-link');
+            const cardLink = document.getElementById('card-checkout-link');
+            const monthlyCardLink = document.getElementById('monthly-card-checkout-link');
+            const orderForm = document.getElementById('money-order-form');
+            const orderStatus = document.getElementById('money-order-status');
+            const orderEmailLink = document.getElementById('money-order-email-link');
+            const orderWhatsAppLink = document.getElementById('money-order-whatsapp-link');
+            const orderLinksWrap = document.getElementById('money-order-links');
+            const orderLineItems = document.getElementById('money-order-line-items');
+            const orderSubmitBtn = document.getElementById('money-order-submit');
+            const orderNotRobot = document.getElementById('order-not-robot');
+            const orderCaptchaQuestion = document.getElementById('order-captcha-question');
+            const orderCaptchaAnswer = document.getElementById('order-captcha-answer');
+            let orderCaptchaExpected = null;
+
+            const formatKES = (value) => `KES ${value.toLocaleString()}`;
+
+            const buildPayPalLink = (amount) => {
+                const params = new URLSearchParams({
+                    cmd: '_xclick',
+                    business: SITE_CONFIG.payments.paypalReceiver,
+                    item_name: 'LifeShape Club Contribution',
+                    currency_code: SITE_CONFIG.payments.currency,
+                    amount: amount > 0 ? String(amount) : '0'
+                });
+                return `${SITE_CONFIG.payments.paypalCheckoutBase}?${params.toString()}`;
+            };
+
+            const setupOrderCaptcha = () => {
+                const min = SITE_CONFIG.captcha.minNumber;
+                const max = SITE_CONFIG.captcha.maxNumber;
+                const a = Math.floor(Math.random() * (max - min + 1)) + min;
+                const b = Math.floor(Math.random() * (max - min + 1)) + min;
+                orderCaptchaExpected = a + b;
+                if (orderCaptchaQuestion) orderCaptchaQuestion.textContent = `Solve: ${a} + ${b}`;
+                if (orderCaptchaAnswer) orderCaptchaAnswer.value = '';
+                if (orderNotRobot) orderNotRobot.checked = false;
+            };
+
+            const render = () => {
+                const selected = Object.entries(quantities).filter(([, qty]) => qty > 0);
+                const total = selected.reduce((sum, [id, qty]) => sum + (catalog[id].amount * qty), 0);
+
+                selected.forEach(([id, qty]) => {
+                    const qtyNode = document.getElementById(`qty-${id}`);
+                    if (qtyNode) qtyNode.textContent = String(qty);
+                });
+                Object.entries(quantities).filter(([, qty]) => qty === 0).forEach(([id]) => {
+                    const qtyNode = document.getElementById(`qty-${id}`);
+                    if (qtyNode) qtyNode.textContent = '0';
+                });
+
+                if (selected.length === 0) {
+                    cartContainer.innerHTML = '<p class="text-gray-500">Your cart is empty. Add causes to proceed.</p>';
+                    if (orderLineItems) orderLineItems.textContent = 'Order items: none selected yet.';
+                    if (orderSubmitBtn) {
+                        orderSubmitBtn.disabled = true;
+                        orderSubmitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                    }
+                } else {
+                    cartContainer.innerHTML = selected.map(([id, qty]) => {
+                        const lineTotal = catalog[id].amount * qty;
+                        return `<div class="flex items-center justify-between"><span>${catalog[id].title} × ${qty}</span><span class="text-gold">${formatKES(lineTotal)}</span></div>`;
+                    }).join('');
+                    if (orderLineItems) {
+                        const itemSummary = selected.map(([id, qty]) => `${catalog[id].title} x${qty}`).join(', ');
+                        orderLineItems.textContent = `Order items: ${itemSummary}.`;
+                    }
+                    if (orderSubmitBtn) {
+                        orderSubmitBtn.disabled = false;
+                        orderSubmitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                    }
+                }
+
+                totalLabel.textContent = formatKES(total);
+                paypalLink.href = buildPayPalLink(total);
+                cardLink.href = SITE_CONFIG.payments.cardCheckoutLink;
+                monthlyCardLink.href = SITE_CONFIG.payments.monthlyCardCheckoutLink;
+            };
+
+            document.querySelectorAll('.qty-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.target;
+                    const delta = Number(btn.dataset.change || 0);
+                    if (!id || !catalog[id]) return;
+                    quantities[id] = Math.max(0, quantities[id] + delta);
+                    render();
+                });
+            });
+
+            if (orderForm) {
+                setupOrderCaptcha();
+                orderForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    const total = Object.entries(quantities).reduce((sum, [id, qty]) => sum + (catalog[id].amount * qty), 0);
+                    if (total <= 0) {
+                        orderStatus.classList.remove('hidden', 'border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                        orderStatus.classList.add('border-red-400/40', 'text-red-300', 'bg-red-900/20');
+                        orderStatus.textContent = 'Add at least one contribution item to create an order.';
+                        return;
+                    }
+
+                    const captchaValid = Boolean(orderNotRobot?.checked) && Number(orderCaptchaAnswer?.value) === orderCaptchaExpected;
+                    if (!captchaValid) {
+                        orderStatus.classList.remove('hidden', 'border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                        orderStatus.classList.add('border-red-400/40', 'text-red-300', 'bg-red-900/20');
+                        orderStatus.textContent = 'Please complete CAPTCHA correctly before placing order.';
+                        setupOrderCaptcha();
+                        return;
+                    }
+
+                    const name = document.getElementById('order-name')?.value?.trim();
+                    const email = document.getElementById('order-email')?.value?.trim();
+                    const phone = document.getElementById('order-phone')?.value?.trim();
+                    const notes = document.getElementById('order-notes')?.value?.trim() || 'N/A';
+                    const paymentMethod = document.getElementById('order-payment-method')?.value || 'paypal';
+                    const ref = `LS-${Date.now().toString().slice(-8)}`;
+
+                    const selected = Object.entries(quantities).filter(([, qty]) => qty > 0).map(([id, qty]) => `${catalog[id].title} x${qty}`).join(', ');
+                    const summary = `LifeShape Money Order
+Ref: ${ref}
+Name: ${name}
+Email: ${email}
+Phone: ${phone}
+Items: ${selected}
+Total: ${formatKES(total)}
+Payment: ${paymentMethod}
+Notes: ${notes}`;
+
+                    orderEmailLink.href = `mailto:${SITE_CONFIG.contactEmail}?subject=${encodeURIComponent(`Money Order ${ref}`)}&body=${encodeURIComponent(summary)}`;
+                    orderWhatsAppLink.href = `https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent(summary)}`;
+                    orderLinksWrap.classList.remove('hidden');
+
+                    orderStatus.classList.remove('hidden', 'border-red-400/40', 'text-red-300', 'bg-red-900/20');
+                    orderStatus.classList.add('border-emerald-400/40', 'text-emerald-300', 'bg-emerald-900/20');
+                    orderStatus.textContent = `Order ${ref} created. Send it via email/WhatsApp then complete payment.`;
+                    setupOrderCaptcha();
+                });
+            }
+
+            render();
+        }
+
+        // Initialize App on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup smooth transitions for the main container
+            document.getElementById('app-content').style.transition = 'opacity 0.2s ease-in-out';
+            
+            // Load Home page by default
+            navigateTo('home');
+            
+            // Initialize icons for the base HTML (header/footer)
+            lucide.createIcons();
+
+            // Initialize form handler for default page load if needed
+            initRegistrationForm();
+            initContributionCart();
+        });
+    </script>
+</body>
+</html>
